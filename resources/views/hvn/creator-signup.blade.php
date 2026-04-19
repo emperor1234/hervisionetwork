@@ -25,12 +25,12 @@
         <div class="form-group">
             <label>I am joining as a…</label>
             <div class="role-options">
-                <label class="role-option" id="opt-viewer">
+                <label class="role-option selected" id="opt-viewer">
                     <input type="radio" name="role" value="viewer" checked>
                     <strong>👁 Viewer</strong>
                     <span>Browse content, join the community, comment & like</span>
                 </label>
-                <label class="role-option selected" id="opt-creator">
+                <label class="role-option" id="opt-creator">
                     <input type="radio" name="role" value="creator">
                     <strong>🎬 Creator</strong>
                     <span>Upload content, manage a public profile & get discovered</span>
@@ -85,10 +85,10 @@
 
             if (!res.ok) {
                 const msgs = data.errors
-                    ? Object.values(data.errors).flat().join('<br>')
+                    ? Object.values(data.errors).flat().join(' ')
                     : (data.message || 'Registration failed. Please try again.');
                 alert.className = 'alert alert-error';
-                alert.innerHTML = msgs;
+                alert.textContent = msgs;
                 alert.style.display = 'block';
                 btn.disabled = false;
                 btn.textContent = 'Create Account';
@@ -103,9 +103,9 @@
                 return;
             }
 
-            // Success — store token if returned, then redirect
-            if (data.boostrapData && data.boostrapData.token) {
-                localStorage.setItem('access_token', data.boostrapData.token);
+            // Success — store token if returned (key has a typo in the server code: boostrapData)
+            if (data.boostrapData && data.boostrapData.access_token) {
+                localStorage.setItem('access_token', data.boostrapData.access_token);
             }
 
             window.location.href = role === 'creator' ? '/creator/dashboard' : '/community';

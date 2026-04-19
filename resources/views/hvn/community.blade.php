@@ -79,7 +79,7 @@ async function submitPost() {
     btn.textContent = 'Posting…';
 
     try {
-        const res = await fetch('/api/v1/community/posts', {
+        const res = await fetch('/community/posts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

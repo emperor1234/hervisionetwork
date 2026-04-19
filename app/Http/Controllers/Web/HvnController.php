@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\CommunityPost;
 use App\CreatorProfile;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class HvnController extends Controller
@@ -38,6 +39,35 @@ class HvnController extends Controller
             ->paginate(20);
 
         return view('hvn.creators', compact('creators'));
+    }
+
+    public function communityStore(Request $request): JsonResponse
+    {
+        if (!auth()->check()) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'body'  => 'required|string|max:10000',
+        ]);
+
+        $post = CommunityPost::create([
+            'user_id' => auth()->id(),
+            'title'   => $request->input('title'),
+            'body'    => $request->input('body'),
+            'status'  => 'published',
+        ]);
+
+        return response()->json(['post' => $post], 201);
+    }
+
+    public function logout(Request $request)
+    {
+        auth()->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
     }
 
     public function creatorProfile(int $userId)

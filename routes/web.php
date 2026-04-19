@@ -134,8 +134,12 @@ Route::get('lists/{id}', 'ListController@show')->middleware('prerenderIfCrawler'
 // HVN STANDALONE PAGES — must be before the catch-all
 Route::get('creator-signup', [HvnController::class, 'creatorSignup']);
 Route::get('community', [HvnController::class, 'community']);
+Route::post('community/posts', [HvnController::class, 'communityStore'])->middleware('web');
 Route::get('creators', [HvnController::class, 'creators']);
 Route::get('creators/{userId}', [HvnController::class, 'creatorProfile'])->where('userId', '[0-9]+');
+
+// SESSION LOGOUT for server-rendered pages
+Route::post('logout', [HvnController::class, 'logout'])->middleware('web');
 
 // CATCH ALL ROUTES AND REDIRECT TO HOME
 Route::get('{all}', $homeController)->where('all', '.*');
