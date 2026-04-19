@@ -14,21 +14,63 @@
         history.replaceState(null, '', cleanUrl(p) + window.location.search + window.location.hash);
     }
 
-    // HVN routes that must always be full page loads (Angular has no route for them)
+    // Map link text → correct HVN path (Angular stores wrong actions in the DB)
+    var HVN_TEXT_MAP = {
+        'community': '/community',
+        'creators':  '/creators',
+        'creator':   '/creators',
+    };
+    // Paths that must always be a hard browser navigation (Angular has no route for them)
     var HVN_PREFIXES = ['/community', '/creators', '/creator-signup'];
+
     function isHvnPath(path) {
         return HVN_PREFIXES.some(function(p) {
             return path === p || path.startsWith(p + '/');
         });
     }
 
-    // Intercept link clicks BEFORE Angular's router (capture phase)
+    function hvnPathForText(text) {
+        var t = (text || '').trim().toLowerCase();
+        for (var key in HVN_TEXT_MAP) {
+            if (t === key || t.indexOf(key) !== -1) return HVN_TEXT_MAP[key];
+        }
+        return null;
+    }
+
+    // Patch every nav <a> whose visible text matches an HVN label.
+    // This fixes links that Angular rendered with the wrong href (e.g. /news).
+    function patchNavLinks() {
+        var links = document.querySelectorAll('nav a, .nav a, [class*="navbar"] a, [class*="header"] a, [class*="menu"] a');
+        links.forEach(function(a) {
+            var path = hvnPathForText(a.textContent);
+            if (!path) return;
+            if (a.getAttribute('href') !== path) {
+                a.setAttribute('href', path);
+            }
+            if (!a.__hvnPatched) {
+                a.__hvnPatched = true;
+                a.addEventListener('click', function(e) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    window.location.href = path;
+                }, true);
+            }
+        });
+    }
+
+    // Run once Angular has rendered, then watch for re-renders
+    setTimeout(patchNavLinks, 400);
+    setTimeout(patchNavLinks, 1200);
+    var navObs = new MutationObserver(patchNavLinks);
+    navObs.observe(document.body, { childList: true, subtree: true });
+
+    // Intercept ALL link clicks (capture phase) — catches any remaining HVN hrefs
     document.addEventListener('click', function (e) {
         var a = e.target && e.target.closest ? e.target.closest('a') : null;
         if (!a) return;
         var href = a.getAttribute('href') || '';
 
-        // Force full page load for HVN pages so Angular router never intercepts them
+        // Force hard navigation for HVN paths
         if (isHvnPath(href)) {
             e.stopImmediatePropagation();
             e.preventDefault();
@@ -36,7 +78,16 @@
             return;
         }
 
-        // Clean trailing %20 from any other links
+        // Force hard navigation if link text matches HVN page
+        var hvnPath = hvnPathForText(a.textContent);
+        if (hvnPath) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            window.location.href = hvnPath;
+            return;
+        }
+
+        // Clean trailing %20 from other links
         if (!/(%20|\s)+$/.test(href)) return;
         var clean = cleanUrl(href);
         if (!clean || clean === href) return;
