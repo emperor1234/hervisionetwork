@@ -14,11 +14,29 @@
         history.replaceState(null, '', cleanUrl(p) + window.location.search + window.location.hash);
     }
 
+    // HVN routes that must always be full page loads (Angular has no route for them)
+    var HVN_PREFIXES = ['/community', '/creators', '/creator-signup'];
+    function isHvnPath(path) {
+        return HVN_PREFIXES.some(function(p) {
+            return path === p || path.startsWith(p + '/');
+        });
+    }
+
     // Intercept link clicks BEFORE Angular's router (capture phase)
     document.addEventListener('click', function (e) {
         var a = e.target && e.target.closest ? e.target.closest('a') : null;
         if (!a) return;
         var href = a.getAttribute('href') || '';
+
+        // Force full page load for HVN pages so Angular router never intercepts them
+        if (isHvnPath(href)) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            window.location.href = href;
+            return;
+        }
+
+        // Clean trailing %20 from any other links
         if (!/(%20|\s)+$/.test(href)) return;
         var clean = cleanUrl(href);
         if (!clean || clean === href) return;
