@@ -97,23 +97,43 @@
         window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
     }, true);
 
-    // Inject "Join as Creator" link directly inside Angular's auth-page form
+    // Inject "Join as a Creator" inside Angular's auth-page sign-in/register form.
+    // auth-page .info-row  = the "Don't have an account?" row inside the panel.
+    // auth-page .auth-panel = the white card containing the form.
     (function injectCreatorLink() {
         var LINK_ID = 'hvn-creator-link';
 
         function inject() {
             if (document.getElementById(LINK_ID)) return;
+            if (!document.querySelector('auth-page')) return;
 
-            // Try footer first, then fall back to auth-page itself
-            var target = document.querySelector('auth-page-footer')
-                      || document.querySelector('auth-page');
+            // Best spot: right after the info-row (sign-in↔register toggle) inside the panel
+            var infoRow   = document.querySelector('auth-page .info-row');
+            var authPanel = document.querySelector('auth-page .auth-panel');
+            var target    = infoRow || authPanel || document.querySelector('auth-page-footer') || document.querySelector('auth-page');
             if (!target) return;
 
-            var wrap = document.createElement('div');
-            wrap.id = LINK_ID;
-            wrap.style.cssText = 'text-align:center;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);font-size:13px;';
-            wrap.innerHTML = 'Want to share content? <a href="/creator-signup" style="color:#6c63ff;font-weight:500;text-decoration:none;">Join as a Creator →</a>';
-            target.appendChild(wrap);
+            var div = document.createElement('div');
+            div.id = LINK_ID;
+            div.style.cssText = [
+                'margin-top:16px',
+                'padding-top:16px',
+                'border-top:1px solid rgba(255,255,255,0.08)',
+                'text-align:center',
+                'font-size:13px',
+                'color:rgba(255,255,255,0.6)',
+                'font-family:Roboto,sans-serif',
+            ].join(';');
+            div.innerHTML = 'Want to share your content? '
+                + '<a href="/creator-signup" onclick="event.stopPropagation();window.location.href=\'/creator-signup\';return false;" '
+                + 'style="color:#F65F54;font-weight:500;text-decoration:none;">Join as a Creator →</a>';
+
+            // Insert after infoRow, or append to panel/page
+            if (infoRow && infoRow.parentNode) {
+                infoRow.parentNode.insertBefore(div, infoRow.nextSibling);
+            } else {
+                target.appendChild(div);
+            }
         }
 
         function cleanup() {
@@ -125,7 +145,6 @@
 
         var obs = new MutationObserver(function() { inject(); cleanup(); });
         obs.observe(document.body, { childList: true, subtree: true });
-        inject();
     }());
 }());
 </script>
