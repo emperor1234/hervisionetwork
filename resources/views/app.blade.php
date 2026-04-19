@@ -28,50 +28,29 @@
         window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
     }, true);
 
-    // Inject "Join as Creator" into Angular's auth-page (register tab)
-    (function injectCreatorBanner() {
-        var BANNER_ID = 'hvn-creator-cta';
+    // Inject "Join as Creator" link directly inside Angular's auth-page form
+    (function injectCreatorLink() {
+        var LINK_ID = 'hvn-creator-link';
 
         function inject() {
-            // auth-page is Angular's component element for sign-in / register
-            var authPage = document.querySelector('auth-page');
-            if (!authPage || document.getElementById(BANNER_ID)) return;
+            if (document.getElementById(LINK_ID)) return;
 
-            // Only inject on the register tab (page contains a password-confirm field,
-            // or simply always inject since creators need to know about the option)
-            var banner = document.createElement('div');
-            banner.id = BANNER_ID;
-            banner.style.cssText = [
-                'position:fixed',
-                'bottom:20px',
-                'right:20px',
-                'z-index:99999',
-                'background:linear-gradient(135deg,#3d3580,#6c63ff)',
-                'color:#fff',
-                'padding:13px 18px',
-                'border-radius:10px',
-                'font-size:13px',
-                'font-family:Roboto,sans-serif',
-                'box-shadow:0 4px 20px rgba(108,99,255,.45)',
-                'cursor:pointer',
-                'text-decoration:none',
-                'display:flex',
-                'align-items:center',
-                'gap:8px',
-                'max-width:220px',
-                'line-height:1.4',
-            ].join(';');
-            banner.innerHTML = '<span style="font-size:18px;">🎬</span><span><strong style="display:block;font-size:14px;margin-bottom:1px;">Join as Creator</strong>Upload content & get discovered</span>';
-            banner.addEventListener('click', function() { window.location.href = '/creator-signup'; });
+            // Try footer first, then fall back to auth-page itself
+            var target = document.querySelector('auth-page-footer')
+                      || document.querySelector('auth-page');
+            if (!target) return;
 
-            document.body.appendChild(banner);
+            var wrap = document.createElement('div');
+            wrap.id = LINK_ID;
+            wrap.style.cssText = 'text-align:center;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);font-size:13px;';
+            wrap.innerHTML = 'Want to share content? <a href="/creator-signup" style="color:#6c63ff;font-weight:500;text-decoration:none;">Join as a Creator →</a>';
+            target.appendChild(wrap);
         }
 
-        // Remove banner when auth-page closes
         function cleanup() {
             if (!document.querySelector('auth-page')) {
-                var b = document.getElementById(BANNER_ID);
-                if (b) b.remove();
+                var el = document.getElementById(LINK_ID);
+                if (el) el.remove();
             }
         }
 
