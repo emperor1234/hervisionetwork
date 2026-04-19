@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\CommunityPost;
 use App\CreatorProfile;
-use App\Http\Controllers\Controller;
+use Common\Core\BaseController as Controller;
 use App\CommunityComment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
