@@ -28,34 +28,56 @@
         window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
     }, true);
 
-    // Inject "Join as Creator" banner into Angular register form
-    (function injectCreatorLink() {
-        var injected = false;
-        function tryInject() {
-            if (injected) return;
-            // Angular register forms typically have a submit button with type=submit
-            // or a form with name/email inputs. Look for registration-related panels.
-            var forms = document.querySelectorAll('auth-page, register-page, [class*="register"], [class*="auth-page"]');
-            if (!forms.length) {
-                forms = document.querySelectorAll('form');
-            }
-            forms.forEach(function(form) {
-                if (form.querySelector('.hvn-creator-inject')) return;
-                // Only inject if form has a username or name field (registration form)
-                var hasNameField = form.querySelector('input[name="name"], input[placeholder*="name" i], input[placeholder*="username" i]');
-                if (!hasNameField) return;
-                var banner = document.createElement('div');
-                banner.className = 'hvn-creator-inject';
-                banner.style.cssText = 'margin-top:16px;padding:14px 16px;background:#1a1a2e;border:1px solid #3d3580;border-radius:8px;text-align:center;font-size:13px;color:#aaa;';
-                banner.innerHTML = 'Want to share your content? <a href="/creator-signup" style="color:#6c63ff;font-weight:500;text-decoration:none;">Join as a Creator →</a>';
-                form.appendChild(banner);
-                injected = true;
-            });
+    // Inject "Join as Creator" into Angular's auth-page (register tab)
+    (function injectCreatorBanner() {
+        var BANNER_ID = 'hvn-creator-cta';
+
+        function inject() {
+            // auth-page is Angular's component element for sign-in / register
+            var authPage = document.querySelector('auth-page');
+            if (!authPage || document.getElementById(BANNER_ID)) return;
+
+            // Only inject on the register tab (page contains a password-confirm field,
+            // or simply always inject since creators need to know about the option)
+            var banner = document.createElement('div');
+            banner.id = BANNER_ID;
+            banner.style.cssText = [
+                'position:fixed',
+                'bottom:20px',
+                'right:20px',
+                'z-index:99999',
+                'background:linear-gradient(135deg,#3d3580,#6c63ff)',
+                'color:#fff',
+                'padding:13px 18px',
+                'border-radius:10px',
+                'font-size:13px',
+                'font-family:Roboto,sans-serif',
+                'box-shadow:0 4px 20px rgba(108,99,255,.45)',
+                'cursor:pointer',
+                'text-decoration:none',
+                'display:flex',
+                'align-items:center',
+                'gap:8px',
+                'max-width:220px',
+                'line-height:1.4',
+            ].join(';');
+            banner.innerHTML = '<span style="font-size:18px;">🎬</span><span><strong style="display:block;font-size:14px;margin-bottom:1px;">Join as Creator</strong>Upload content & get discovered</span>';
+            banner.addEventListener('click', function() { window.location.href = '/creator-signup'; });
+
+            document.body.appendChild(banner);
         }
-        var obs = new MutationObserver(function() { tryInject(); });
+
+        // Remove banner when auth-page closes
+        function cleanup() {
+            if (!document.querySelector('auth-page')) {
+                var b = document.getElementById(BANNER_ID);
+                if (b) b.remove();
+            }
+        }
+
+        var obs = new MutationObserver(function() { inject(); cleanup(); });
         obs.observe(document.body, { childList: true, subtree: true });
-        // Also try immediately after Angular boots
-        window.addEventListener('load', function() { setTimeout(tryInject, 800); });
+        inject();
     }());
 }());
 </script>
