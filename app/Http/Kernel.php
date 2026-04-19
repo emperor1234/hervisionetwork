@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\EncryptCookies;
+use App\Http\Middleware\ServeHvnPages;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\TrimStrings;
 use App\Http\Middleware\TrustHosts;
@@ -60,6 +61,7 @@ class Kernel extends HttpKernel
             ShareErrorsFromSession::class,
             VerifyCsrfToken::class,
             SubstituteBindings::class,
+            ServeHvnPages::class,
         ],
 
         'api' => [

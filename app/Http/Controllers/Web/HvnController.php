@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\CommunityPost;
 use App\CreatorProfile;
 use App\Http\Controllers\Controller;
+use App\CommunityComment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -60,6 +61,36 @@ class HvnController extends Controller
         ]);
 
         return response()->json(['post' => $post], 201);
+    }
+
+    public function communityShow(Request $request, int $postId)
+    {
+        $post = CommunityPost::with(['user:id,username', 'comments.user:id,username'])
+            ->published()
+            ->withCount(['comments', 'likes'])
+            ->findOrFail($postId);
+
+        return view('hvn.community-post', compact('post'));
+    }
+
+    public function commentStore(Request $request, int $postId): JsonResponse
+    {
+        if (!auth()->check()) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        $request->validate(['body' => 'required|string|max:5000']);
+
+        $post = CommunityPost::published()->findOrFail($postId);
+
+        $comment = CommunityComment::create([
+            'post_id'    => $post->id,
+            'user_id'    => auth()->id(),
+            'body'       => $request->input('body'),
+            'created_at' => now(),
+        ]);
+
+        return response()->json(['comment' => $comment->load('user:id,username')], 201);
     }
 
     public function logout(Request $request)
