@@ -13,8 +13,8 @@ class CreateCreatorProfilesTable extends Migration
         }
 
         Schema::create('creator_profiles', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->autoIncrement();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedInteger('id')->autoIncrement();
+            $table->unsignedInteger('user_id');
             $table->string('display_name', 150)->default('');
             $table->text('bio')->nullable();
             $table->string('profile_photo', 255)->nullable();

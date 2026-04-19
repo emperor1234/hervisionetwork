@@ -13,9 +13,9 @@ class CreateCommunityLikesTable extends Migration
         }
 
         Schema::create('community_likes', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->autoIncrement();
-            $table->unsignedBigInteger('post_id');
-            $table->unsignedBigInteger('user_id');
+            $table->increments('id');
+            $table->unsignedInteger('post_id');
+            $table->unsignedInteger('user_id');
             $table->timestamp('created_at')->useCurrent();
 
             $table->unique(['post_id', 'user_id']);

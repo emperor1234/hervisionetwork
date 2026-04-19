@@ -13,8 +13,8 @@ class CreateCommunityPostsTable extends Migration
         }
 
         Schema::create('community_posts', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->autoIncrement();
-            $table->unsignedBigInteger('user_id');
+            $table->increments('id');
+            $table->unsignedInteger('user_id');
             $table->string('title', 255);
             $table->text('body');
             $table->enum('status', ['published', 'draft', 'removed'])->default('published');
