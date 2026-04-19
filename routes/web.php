@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\Web\HvnController;
 
 Route::group(['prefix' => 'secure'], function () {
     // titles
@@ -129,6 +130,12 @@ Route::get('people/{id}/{name}', 'PersonController@show')->middleware('prerender
 Route::get('news', 'NewsController@index')->middleware('prerenderIfCrawler');
 Route::get('news/{id}', 'NewsController@show')->middleware('prerenderIfCrawler');
 Route::get('lists/{id}', 'ListController@show')->middleware('prerenderIfCrawler');
+
+// HVN STANDALONE PAGES — must be before the catch-all
+Route::get('creator-signup', [HvnController::class, 'creatorSignup']);
+Route::get('community', [HvnController::class, 'community']);
+Route::get('creators', [HvnController::class, 'creators']);
+Route::get('creators/{userId}', [HvnController::class, 'creatorProfile'])->where('userId', '[0-9]+');
 
 // CATCH ALL ROUTES AND REDIRECT TO HOME
 Route::get('{all}', $homeController)->where('all', '.*');
