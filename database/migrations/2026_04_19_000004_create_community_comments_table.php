@@ -20,8 +20,7 @@ class CreateCommunityCommentsTable extends Migration
             $table->timestamp('created_at')->useCurrent();
 
             $table->index('post_id');
-            $table->foreign('post_id')->references('id')->on('community_posts')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->index('user_id');
         });
     }
 

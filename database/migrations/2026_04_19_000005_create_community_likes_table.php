@@ -19,8 +19,7 @@ class CreateCommunityLikesTable extends Migration
             $table->timestamp('created_at')->useCurrent();
 
             $table->unique(['post_id', 'user_id']);
-            $table->foreign('post_id')->references('id')->on('community_posts')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->index('post_id');
         });
     }
 

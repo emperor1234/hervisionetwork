@@ -22,7 +22,6 @@ class CreateCommunityPostsTable extends Migration
 
             $table->index('user_id');
             $table->index('status');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
