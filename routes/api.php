@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\CreatorProfileController;
+use App\Http\Controllers\CreatorsDirectoryController;
 use App\Http\Controllers\EpisodeController;
 use App\Http\Controllers\ListController;
 use App\Http\Controllers\ListItemController;
@@ -76,6 +79,23 @@ Route::group(['prefix' => 'v1'], function() {
         Route::get('user-profile/{user}/ratings', [UserProfileController::class, 'loadRatings']);
         Route::get('user-profile/{user}/reviews', [UserProfileController::class, 'loadReviews']);
         Route::get('user-profile/{user}/comments', [UserProfileController::class, 'loadComments']);
+
+        // CREATORS DIRECTORY — accessible to all authenticated users
+        Route::get('creators', [CreatorsDirectoryController::class, 'index']);
+        Route::get('creators/{userId}', [CreatorsDirectoryController::class, 'show']);
+
+        // COMMUNITY — accessible to all authenticated users
+        Route::get('community/posts', [CommunityController::class, 'index']);
+        Route::get('community/posts/{postId}', [CommunityController::class, 'show']);
+        Route::post('community/posts', [CommunityController::class, 'store']);
+        Route::post('community/posts/{postId}/comments', [CommunityController::class, 'addComment']);
+        Route::post('community/posts/{postId}/like', [CommunityController::class, 'toggleLike']);
+
+        // CREATOR PROFILE — restricted to creator role only
+        Route::middleware('role:creator')->group(function () {
+            Route::get('creator/profile', [CreatorProfileController::class, 'show']);
+            Route::post('creator/profile', [CreatorProfileController::class, 'store']);
+        });
     });
 
     // AUTH

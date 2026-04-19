@@ -204,6 +204,10 @@ class UserRepository {
         if ($type === 'create') {
             $formatted['email'] = $params['email'];
             $formatted['password'] = Arr::get($params, 'password') ? bcrypt($params['password']) : null;
+            $allowedRoles = ['viewer', 'creator'];
+            $formatted['role'] = in_array(Arr::get($params, 'role'), $allowedRoles, true)
+                ? $params['role']
+                : 'viewer';
         } else if ($type === 'update' && Arr::get($params, 'password')) {
             $formatted['password'] = bcrypt($params['password']);
         }

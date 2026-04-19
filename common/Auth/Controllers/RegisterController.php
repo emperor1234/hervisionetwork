@@ -42,9 +42,10 @@ class RegisterController extends BaseController
     public function register(Request $request)
     {
         $this->validate($request, [
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:5', 'confirmed'],
+            'email'      => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'   => ['required', 'string', 'min:5', 'confirmed'],
             'token_name' => 'string|min:3|max:50',
+            'role'       => 'nullable|string|in:viewer,creator',
         ]);
 
         $params = $request->all();

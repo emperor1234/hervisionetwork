@@ -10,11 +10,19 @@ use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
+ * @property string $role  'viewer' | 'creator'
  * @property-read Collection|ListModel[] $watchlist
  */
 class User extends BaseUser
 {
     use HasApiTokens;
+
+    protected $casts = [
+        'id'                => 'integer',
+        'available_space'   => 'integer',
+        'email_verified_at' => 'datetime',
+        'role'              => 'string',
+    ];
 
     public function watchlist(): HasOne
     {
@@ -36,5 +44,25 @@ class User extends BaseUser
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function creatorProfile(): HasOne
+    {
+        return $this->hasOne(CreatorProfile::class);
+    }
+
+    public function communityPosts(): HasMany
+    {
+        return $this->hasMany(CommunityPost::class);
+    }
+
+    public function isCreator(): bool
+    {
+        return $this->role === 'creator';
+    }
+
+    public function isViewer(): bool
+    {
+        return $this->role === 'viewer';
     }
 }

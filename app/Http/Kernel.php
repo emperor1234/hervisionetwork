@@ -86,5 +86,6 @@ class Kernel extends HttpKernel
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
         'prerenderIfCrawler' => PrerenderIfCrawler::class,
+        'role' => \App\Http\Middleware\RequireRole::class,
     ];
 }
