@@ -5,16 +5,28 @@
 (function () {
     function cleanUrl(url) {
         if (!url) return url;
-        return url.replace(/(%20)+$/, '').replace(/\s+$/, '');
+        return url.replace(/(%20|\s)+$/, '');
     }
-    var _push = history.pushState.bind(history);
-    var _replace = history.replaceState.bind(history);
-    history.pushState = function (s, t, url) { return _push(s, t, cleanUrl(url)); };
-    history.replaceState = function (s, t, url) { return _replace(s, t, cleanUrl(url)); };
+
+    // Fix address bar on hard load
     var p = window.location.pathname;
-    if (/(%20)+$/.test(p) || /\s+$/.test(p)) {
+    if (/(%20|\s)+$/.test(p)) {
         history.replaceState(null, '', cleanUrl(p) + window.location.search + window.location.hash);
     }
+
+    // Intercept link clicks BEFORE Angular's router (capture phase)
+    document.addEventListener('click', function (e) {
+        var a = e.target && e.target.closest ? e.target.closest('a') : null;
+        if (!a) return;
+        var href = a.getAttribute('href') || '';
+        if (!/(%20|\s)+$/.test(href)) return;
+        var clean = cleanUrl(href);
+        if (!clean || clean === href) return;
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        history.pushState(null, '', clean);
+        window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
+    }, true);
 }());
 </script>
 @endsection
