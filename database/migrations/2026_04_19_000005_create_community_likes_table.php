@@ -8,6 +8,10 @@ class CreateCommunityLikesTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('community_likes')) {
+            return;
+        }
+
         Schema::create('community_likes', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->unsignedBigInteger('post_id');

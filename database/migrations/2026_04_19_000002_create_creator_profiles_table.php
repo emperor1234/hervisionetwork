@@ -8,6 +8,10 @@ class CreateCreatorProfilesTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('creator_profiles')) {
+            return;
+        }
+
         Schema::create('creator_profiles', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->unsignedBigInteger('user_id');

@@ -8,6 +8,10 @@ class CreateCommunityCommentsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('community_comments')) {
+            return;
+        }
+
         Schema::create('community_comments', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->unsignedBigInteger('post_id');

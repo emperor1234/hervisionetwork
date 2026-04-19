@@ -8,6 +8,10 @@ class CreateCommunityPostsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('community_posts')) {
+            return;
+        }
+
         Schema::create('community_posts', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->autoIncrement();
             $table->unsignedBigInteger('user_id');
