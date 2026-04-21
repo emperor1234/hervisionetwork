@@ -31,11 +31,12 @@
 
     function hvnPathForText(text) {
         var t = (text || '').trim().toLowerCase();
+        // "Join as Creator" / "Join as a Creator" CTAs always go to signup
+        if (t.indexOf('join') !== -1 && t.indexOf('creator') !== -1) {
+            return '/creator-signup';
+        }
         for (var key in HVN_TEXT_MAP) {
-            // whole-word match: 'community' hits "Community" but not "Join as Creator"
             if (t === key || new RegExp('\\b' + key + '\\b').test(t)) {
-                // reject if the text is clearly a CTA like "join as creators"
-                if (t.indexOf('join') !== -1) continue;
                 return HVN_TEXT_MAP[key];
             }
         }
@@ -79,20 +80,20 @@
         if (!a) return;
         var href = a.getAttribute('href') || '';
 
-        // Force hard navigation for HVN paths
-        if (isHvnPath(href)) {
-            e.stopImmediatePropagation();
-            e.preventDefault();
-            window.location.href = href;
-            return;
-        }
-
-        // Force hard navigation if link text matches HVN page
+        // Text-based check takes priority — corrects Angular's wrong hrefs (e.g. "Join as Creator" → /creator-signup)
         var hvnPath = hvnPathForText(a.textContent);
         if (hvnPath) {
             e.stopImmediatePropagation();
             e.preventDefault();
             window.location.href = hvnPath;
+            return;
+        }
+
+        // Force hard navigation for HVN paths
+        if (isHvnPath(href)) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            window.location.href = href;
             return;
         }
 

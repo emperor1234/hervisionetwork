@@ -37,7 +37,7 @@
         color: #e0e0e0; padding: 12px 14px; font-size: 14px; font-family: inherit;
         resize: vertical; min-height: 80px; outline: none; transition: border-color .2s;
     }
-    .comment-form textarea:focus { border-color: #6c63ff; }  /* matches layout accent */
+    .comment-form textarea:focus { border-color: #F65F54; }  /* matches layout accent */
     .comment-form-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
     #comment-alert { margin-bottom: 10px; }
 
@@ -98,7 +98,7 @@
     </div>
     @else
     <div style="margin-top:24px; padding-top:20px; border-top:1px solid #1e1e1e; text-align:center; font-size:14px; color:#555;">
-        <a href="/login" style="color:#6c63ff; text-decoration:none;">Sign in</a> to leave a comment.
+        <a href="/login" style="color:#F65F54; text-decoration:none;">Sign in</a> to leave a comment.
     </div>
     @endauth
 </div>

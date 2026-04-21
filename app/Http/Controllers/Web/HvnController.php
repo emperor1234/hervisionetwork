@@ -33,10 +33,9 @@ class HvnController extends Controller
 
     public function creators(Request $request)
     {
-        $creators = CreatorProfile::whereHas('user', function ($q) {
-                $q->where('role', 'creator');
-            })
-            ->orderBy('display_name')
+        $creators = \App\User::where('role', 'creator')
+            ->with('creatorProfile')
+            ->orderBy('username')
             ->paginate(20);
 
         return view('hvn.creators', compact('creators'));

@@ -10,22 +10,28 @@
 @if($creators->isEmpty())
     <div class="empty-state">
         <h3>No creators yet</h3>
-        <p>Be the first — <a href="/creator-signup" style="color:#6c63ff;">join as a Creator</a>.</p>
+        <p>Be the first — <a href="/creator-signup" style="color:#F65F54;">join as a Creator</a>.</p>
     </div>
 @else
     <div class="creator-grid">
-    @foreach($creators as $profile)
-        <a href="/creators/{{ $profile->user_id }}" class="hvn-card creator-card">
+    @foreach($creators as $user)
+        @php
+            $profile     = $user->creatorProfile;
+            $displayName = $profile->display_name ?? $user->username;
+            $photo       = $profile->profile_photo ?? null;
+            $bio         = $profile->bio ?? null;
+        @endphp
+        <a href="/creators/{{ $user->id }}" class="hvn-card creator-card">
             <div class="creator-avatar">
-                @if($profile->profile_photo)
-                    <img src="{{ asset('storage/' . $profile->profile_photo) }}" alt="{{ $profile->display_name }}">
+                @if($photo)
+                    <img src="{{ asset('storage/' . $photo) }}" alt="{{ $displayName }}">
                 @else
-                    {{ strtoupper(substr($profile->display_name ?: '?', 0, 1)) }}
+                    {{ strtoupper(substr($displayName ?: '?', 0, 1)) }}
                 @endif
             </div>
-            <div class="creator-name">{{ $profile->display_name }}</div>
-            @if($profile->bio)
-                <div class="creator-bio">{{ Str::limit($profile->bio, 100) }}</div>
+            <div class="creator-name">{{ $displayName }}</div>
+            @if($bio)
+                <div class="creator-bio">{{ Str::limit($bio, 100) }}</div>
             @endif
         </a>
     @endforeach
