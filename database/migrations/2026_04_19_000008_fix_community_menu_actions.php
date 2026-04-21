@@ -26,7 +26,7 @@ class FixCommunityMenuActions extends Migration
             foreach ($menu['items'] as &$item) {
                 $label = strtolower($item['label'] ?? '');
                 foreach ($this->fixes as $keyword => $correctPath) {
-                    if (str_contains($label, $keyword)) {
+                    if (strpos($label, $keyword) !== false) {
                         if (($item['action'] ?? '') !== $correctPath) {
                             $item['action'] = $correctPath;
                             $item['type']   = 'link';

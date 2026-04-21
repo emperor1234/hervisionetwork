@@ -32,8 +32,12 @@
     function hvnPathForText(text) {
         var t = (text || '').trim().toLowerCase();
         for (var key in HVN_TEXT_MAP) {
-            // exact match only — prevent 'creators' matching 'Join as Creator'
-            if (t === key) return HVN_TEXT_MAP[key];
+            // whole-word match: 'community' hits "Community" but not "Join as Creator"
+            if (t === key || new RegExp('\\b' + key + '\\b').test(t)) {
+                // reject if the text is clearly a CTA like "join as creators"
+                if (t.indexOf('join') !== -1) continue;
+                return HVN_TEXT_MAP[key];
+            }
         }
         return null;
     }
@@ -62,7 +66,11 @@
     // Run once Angular has rendered, then watch for re-renders
     setTimeout(patchNavLinks, 400);
     setTimeout(patchNavLinks, 1200);
-    var navObs = new MutationObserver(patchNavLinks);
+    var navPatchTimer;
+    var navObs = new MutationObserver(function() {
+        clearTimeout(navPatchTimer);
+        navPatchTimer = setTimeout(patchNavLinks, 150);
+    });
     navObs.observe(document.body, { childList: true, subtree: true });
 
     // Intercept ALL link clicks (capture phase) — catches any remaining HVN hrefs

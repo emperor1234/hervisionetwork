@@ -146,7 +146,7 @@ async function submitComment() {
             el.innerHTML = `
                 <div class="comment-avatar">${initial}</div>
                 <div class="comment-bubble">
-                    <div class="comment-meta"><strong>${username}</strong> just now</div>
+                    <div class="comment-meta"><strong>${escHtml(username)}</strong> just now</div>
                     <p>${escHtml(c.body)}</p>
                 </div>`;
             document.getElementById('comments-list').appendChild(el);
