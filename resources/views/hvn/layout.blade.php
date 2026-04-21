@@ -15,42 +15,37 @@
             min-height: 100vh;
         }
 
-        /* NAV — matches Angular header layout: logo | search | links | user */
+        /* NAV — pixel-matches Angular header: logo | search | links | user */
         .hvn-nav {
             background: #121212;
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 0 20px;
+            padding: 0 24px;
             display: flex;
             align-items: center;
-            gap: 16px;
             height: 64px;
             position: sticky;
             top: 0;
             z-index: 100;
         }
         .hvn-logo {
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            color: #fff;
+            display: flex;
+            align-items: center;
             text-decoration: none;
-            text-transform: uppercase;
-            line-height: 1.2;
-            white-space: nowrap;
             flex-shrink: 0;
+            margin-right: 24px;
         }
-        .hvn-logo span { display: block; font-size: 8px; letter-spacing: 5px; font-weight: 300; color: #bbb; }
+        .hvn-logo img { height: 36px; width: auto; display: block; }
 
-        /* Search bar */
+        /* Search bar — grows to fill available space */
         .hvn-search {
             flex: 1;
-            max-width: 480px;
             position: relative;
+            margin-right: 24px;
         }
         .hvn-search input {
             width: 100%;
             background: #2a2a2a;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid transparent;
             border-radius: 4px;
             color: #e0e0e0;
             padding: 9px 40px 9px 14px;
@@ -58,38 +53,39 @@
             font-family: inherit;
             outline: none;
         }
-        .hvn-search input::placeholder { color: #777; }
-        .hvn-search input:focus { border-color: rgba(255,255,255,0.2); }
+        .hvn-search input::placeholder { color: #6b6b6b; }
+        .hvn-search input:focus { border-color: rgba(255,255,255,0.15); }
         .hvn-search svg {
             position: absolute;
             right: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: #666;
+            color: #6b6b6b;
             pointer-events: none;
         }
 
         /* Nav links */
         .hvn-nav-links {
             display: flex;
-            gap: 4px;
             align-items: center;
+            gap: 0;
             flex-shrink: 0;
         }
         .hvn-nav-links a {
             color: #ccc;
             text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 4px;
+            padding: 6px 16px;
             font-size: 14px;
             white-space: nowrap;
+            border-radius: 4px;
             transition: color .15s, background .15s;
         }
-        .hvn-nav-links a:hover, .hvn-nav-links a.active { color: #fff; background: rgba(255,255,255,0.08); }
+        .hvn-nav-links a:hover, .hvn-nav-links a.active { color: #fff; background: rgba(255,255,255,0.07); }
         .hvn-nav-links a.btn-accent {
             background: #F65F54;
             color: #fff;
             font-weight: 500;
+            margin-left: 8px;
         }
         .hvn-nav-links a.btn-accent:hover { background: #d94f45; }
 
@@ -99,6 +95,7 @@
             align-items: center;
             gap: 8px;
             flex-shrink: 0;
+            margin-left: 16px;
             cursor: pointer;
             position: relative;
         }
@@ -107,7 +104,6 @@
             height: 32px;
             border-radius: 4px;
             background: #3a3a3a;
-            object-fit: cover;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -119,7 +115,7 @@
         }
         .hvn-user-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
         .hvn-user-email { font-size: 13px; color: #ccc; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .hvn-user-caret { color: #888; font-size: 10px; margin-left: 2px; }
+        .hvn-user-caret { color: #888; font-size: 10px; }
         .hvn-user-menu {
             display: none;
             position: absolute;
@@ -314,16 +310,8 @@
 
 <nav class="hvn-nav">
     {{-- Logo --}}
-    @php
-        try {
-            $hvnLogoPath = app(\Common\Settings\Settings::class)->get('branding.logo_dark');
-            $hvnLogoUrl  = $hvnLogoPath ? asset('storage/' . $hvnLogoPath) : asset('storage/branding_media/BYnrmXBiztBYfakdtYol94onVywTZ2TfQDGCUYId.png');
-        } catch (\Exception $e) {
-            $hvnLogoUrl = asset('storage/branding_media/BYnrmXBiztBYfakdtYol94onVywTZ2TfQDGCUYId.png');
-        }
-    @endphp
     <a href="/" class="hvn-logo">
-        <img src="{{ $hvnLogoUrl }}" alt="Her Vision Network" style="height:36px;width:auto;display:block;">
+        <img src="/storage/branding_media/BYnrmXBiztBYfakdtYol94onVywTZ2TfQDGCUYId.png" alt="Her Vision Network">
     </a>
 
     {{-- Search --}}
@@ -369,7 +357,7 @@
             </div>
         </div>
     @else
-        <div class="hvn-nav-links" style="margin-left:auto;">
+        <div class="hvn-nav-links">
             <a href="/login">Sign In</a>
             <a href="/creator-signup" class="btn-accent">Join as Creator</a>
         </div>
