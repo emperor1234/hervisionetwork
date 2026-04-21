@@ -15,10 +15,10 @@
     }
 
     // Map link text → correct HVN path (Angular stores wrong actions in the DB)
+    // Keys are matched as exact words only — 'creators' must not match 'Join as Creator'.
     var HVN_TEXT_MAP = {
         'community': '/community',
         'creators':  '/creators',
-        'creator':   '/creators',
     };
     // Paths that must always be a hard browser navigation (Angular has no route for them)
     var HVN_PREFIXES = ['/community', '/creators', '/creator-signup'];
@@ -32,7 +32,8 @@
     function hvnPathForText(text) {
         var t = (text || '').trim().toLowerCase();
         for (var key in HVN_TEXT_MAP) {
-            if (t === key || t.indexOf(key) !== -1) return HVN_TEXT_MAP[key];
+            // exact match only — prevent 'creators' matching 'Join as Creator'
+            if (t === key) return HVN_TEXT_MAP[key];
         }
         return null;
     }
