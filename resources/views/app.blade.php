@@ -46,7 +46,7 @@
     // Patch every nav <a> whose visible text matches an HVN label.
     // This fixes links that Angular rendered with the wrong href (e.g. /news).
     function patchNavLinks() {
-        var links = document.querySelectorAll('nav a, .nav a, [class*="navbar"] a, [class*="header"] a, [class*="menu"] a');
+        var links = document.querySelectorAll('nav a, .nav a, [class*="navbar"] a, [class*="header"] a');
         links.forEach(function(a) {
             var path = hvnPathForText(a.textContent);
             if (!path) return;

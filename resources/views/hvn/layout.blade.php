@@ -315,14 +315,14 @@
     </a>
 
     {{-- Search --}}
-    <form class="hvn-search" action="/" method="GET" onsubmit="this.action='/';return true;">
-        <input type="text" name="query" placeholder="Search for movies, tv shows and people…"
+    <div class="hvn-search">
+        <input type="text" placeholder="Search for movies, tv shows and people…"
                value="{{ request('query') }}"
-               onkeydown="if(event.key==='Enter'){window.location.href='/?query='+encodeURIComponent(this.value);event.preventDefault();}">
+               onkeydown="if(event.key==='Enter'&&this.value.trim()){window.location.href='/?query='+encodeURIComponent(this.value.trim());event.preventDefault();}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-    </form>
+    </div>
 
     {{-- Nav links --}}
     <div class="hvn-nav-links">
@@ -330,11 +330,16 @@
         <a href="/series">Series</a>
         <a href="/creators" class="{{ request()->is('creators*') ? 'active' : '' }}">Creators</a>
         <a href="/community" class="{{ request()->is('community*') ? 'active' : '' }}">Community</a>
+        @auth
+            @php $u = auth()->user(); @endphp
+        @else
+            <a href="/login">Sign In</a>
+            <a href="/creator-signup" class="btn-accent">Join as Creator</a>
+        @endauth
     </div>
 
-    {{-- User --}}
+    {{-- User chip (authenticated only) --}}
     @auth
-        @php $u = auth()->user(); @endphp
         <div class="hvn-user">
             <div class="hvn-user-avatar">
                 @if($u->avatar)
@@ -355,11 +360,6 @@
                     <button type="submit">Sign Out</button>
                 </form>
             </div>
-        </div>
-    @else
-        <div class="hvn-nav-links">
-            <a href="/login">Sign In</a>
-            <a href="/creator-signup" class="btn-accent">Join as Creator</a>
         </div>
     @endauth
 </nav>

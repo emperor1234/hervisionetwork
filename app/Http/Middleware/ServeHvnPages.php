@@ -12,7 +12,18 @@ class ServeHvnPages
     public function handle(Request $request, Closure $next)
     {
         $path = $request->path();
-        $c    = app(HvnController::class);
+
+        // Quick prefix check — skip controller instantiation for non-HVN requests
+        $isHvn = str_starts_with($path, 'community') ||
+                 str_starts_with($path, 'creators')  ||
+                 $path === 'creator-signup'           ||
+                 $path === 'logout';
+
+        if (!$isHvn) {
+            return $next($request);
+        }
+
+        $c = app(HvnController::class);
 
         if ($request->isMethod('GET')) {
             if ($path === 'community')      return $this->r($c->community($request));

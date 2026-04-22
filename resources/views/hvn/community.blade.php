@@ -16,17 +16,17 @@
 
 .post-card-link {
     display: block; text-decoration: none; color: inherit;
-    background: #1a1a1a; border: 1px solid #2a2a2a;
+    background: #2a2a2a; border: 1px solid rgba(255,255,255,0.06);
     border-radius: 10px; padding: 16px 18px;
     transition: border-color .2s, background .2s;
 }
-.post-card-link:hover { border-color: #6c63ff; background: #1c1c2e; }
+.post-card-link:hover { border-color: #F65F54; background: #2d1a19; }
 
 .post-card-body { display: flex; gap: 14px; align-items: flex-start; }
 
 .post-avatar {
     flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, #3d3580 0%, #6c63ff 100%);
+    background: linear-gradient(135deg, #a83428 0%, #F65F54 100%);
     display: flex; align-items: center; justify-content: center;
     font-size: 16px; font-weight: 700; color: #fff; text-transform: uppercase;
 }
@@ -64,11 +64,11 @@
 /* ── Compose ── */
 .compose-bar {
     display: flex; align-items: center; gap: 12px;
-    background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px;
+    background: #2a2a2a; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;
     padding: 12px 16px; margin-bottom: 20px; cursor: pointer;
     transition: border-color .2s;
 }
-.compose-bar:hover { border-color: #6c63ff; }
+.compose-bar:hover { border-color: #F65F54; }
 .compose-avatar {
     width: 34px; height: 34px; border-radius: 50%;
     background: #2a2a2a; display: flex; align-items: center; justify-content: center;
@@ -84,19 +84,19 @@
     color: #e0e0e0; padding: 11px 14px; font-size: 15px; font-family: inherit;
     outline: none; margin-bottom: 10px; transition: border-color .2s;
 }
-.np-input:focus { border-color: #6c63ff; }
+.np-input:focus { border-color: #F65F54; }
 .np-textarea {
     width: 100%; background: #111; border: 1px solid #333; border-radius: 6px;
     color: #e0e0e0; padding: 12px 14px; font-size: 14px; font-family: inherit;
     resize: vertical; min-height: 90px; outline: none; transition: border-color .2s;
 }
-.np-textarea:focus { border-color: #6c63ff; }
+.np-textarea:focus { border-color: #F65F54; }
 .np-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
 .np-cancel { background: none; border: none; color: #666; font-size: 13px; cursor: pointer; font-family: inherit; }
 .np-cancel:hover { color: #aaa; }
 
 /* ── Empty ── */
-.forum-empty { text-align: center; padding: 56px 20px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; }
+.forum-empty { text-align: center; padding: 56px 20px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; }
 .forum-empty h3 { font-size: 18px; color: #666; margin-bottom: 8px; }
 .forum-empty p { font-size: 14px; color: #555; }
 
@@ -104,9 +104,9 @@
 .forum-pagination { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 20px; }
 .forum-pagination a, .forum-pagination span {
     padding: 7px 16px; border-radius: 6px; font-size: 13px;
-    background: #1a1a1a; border: 1px solid #2a2a2a; color: #aaa; text-decoration: none;
+    background: #2a2a2a; border: 1px solid rgba(255,255,255,0.06); color: #aaa; text-decoration: none;
 }
-.forum-pagination a:hover { background: #6c63ff; border-color: #6c63ff; color: #fff; }
+.forum-pagination a:hover { background: #F65F54; border-color: #F65F54; color: #fff; }
 .forum-pagination .pg-info { background: transparent; border-color: transparent; color: #555; }
 </style>
 @endsection
