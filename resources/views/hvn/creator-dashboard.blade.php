@@ -130,7 +130,7 @@
                     {{ strtoupper(substr($user->username ?? $user->email, 0, 1)) }}
                 @endif
             </div>
-            <div class="dash-name">{{ $profile->display_name ?? $user->username }}</div>
+            <div class="dash-name">{{ optional($profile)->display_name ?? $user->username }}</div>
             <div class="dash-email">{{ $user->email }}</div>
             @if($profile && $profile->bio)
                 <div class="dash-bio">{{ $profile->bio }}</div>
@@ -142,10 +142,10 @@
         <div class="profile-form" id="profile-form-card">
             <h3>Edit Public Profile</h3>
             <div id="profile-alert" class="alert" style="display:none;"></div>
-            <input type="text" id="pf-name"    placeholder="Display name" value="{{ e($profile->display_name ?? '') }}">
-            <textarea id="pf-bio" placeholder="Short bio (shown on your creator card)">{{ e($profile->bio ?? '') }}</textarea>
-            <input type="url"  id="pf-website" placeholder="Website URL (https://…)" value="{{ e($profile->website_url ?? '') }}">
-            <input type="text" id="pf-contact" placeholder="Public contact email" value="{{ e($profile->contact_email ?? '') }}">
+            <input type="text" id="pf-name"    placeholder="Display name" value="{{ e(optional($profile)->display_name ?? '') }}">
+            <textarea id="pf-bio" placeholder="Short bio (shown on your creator card)">{{ e(optional($profile)->bio ?? '') }}</textarea>
+            <input type="url"  id="pf-website" placeholder="Website URL (https://…)" value="{{ e(optional($profile)->website_url ?? '') }}">
+            <input type="text" id="pf-contact" placeholder="Public contact email" value="{{ e(optional($profile)->contact_email ?? '') }}">
             <button class="dash-edit-btn" style="margin-top:4px;" onclick="saveProfile()">Save Profile</button>
         </div>
     </div>
