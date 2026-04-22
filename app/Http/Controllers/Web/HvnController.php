@@ -121,6 +121,29 @@ class HvnController extends Controller
         return view('hvn.creator-dashboard', compact('user', 'profile', 'posts'));
     }
 
+    public function profileUpdate(Request $request): JsonResponse
+    {
+        if (!auth()->check()) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+        if (auth()->user()->role !== 'creator') {
+            return response()->json(['message' => 'Forbidden.'], 403);
+        }
+
+        $request->validate([
+            'display_name'  => 'nullable|string|max:100',
+            'bio'           => 'nullable|string|max:1000',
+            'website_url'   => 'nullable|url|max:255',
+            'contact_email' => 'nullable|email|max:255',
+        ]);
+
+        $profile = CreatorProfile::firstOrCreate(['user_id' => auth()->id()]);
+        $profile->fill($request->only('display_name', 'bio', 'website_url', 'contact_email'));
+        $profile->save();
+
+        return response()->json(['message' => 'Profile updated.']);
+    }
+
     public function creatorProfile(string $username)
     {
         $user = \App\User::where('username', $username)

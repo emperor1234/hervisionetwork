@@ -191,7 +191,7 @@ async function saveProfile() {
     };
 
     try {
-        const res = await fetch('/api/v1/creator/profile', {
+        const res = await fetch('/creator/profile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

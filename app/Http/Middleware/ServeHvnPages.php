@@ -17,8 +17,7 @@ class ServeHvnPages
         // Uses strpos() for PHP 7.x compatibility (str_starts_with requires PHP 8.0+)
         $isHvn = strpos($path, 'community') === 0     ||
                  strpos($path, 'creators') === 0      ||
-                 $path === 'creator-signup'            ||
-                 $path === 'creator/dashboard'         ||
+                 strpos($path, 'creator') === 0       ||
                  $path === 'logout';
 
         if (!$isHvn) {
@@ -46,6 +45,9 @@ class ServeHvnPages
 
             if (preg_match('/^community\/(\d+)\/comments$/', $path, $m))
                 return $this->r($c->commentStore($request, (int) $m[1]));
+
+            if ($path === 'creator/profile')
+                return $this->r($c->profileUpdate($request));
 
             if ($path === 'logout')
                 return $this->r($c->logout($request));
