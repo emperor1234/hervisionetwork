@@ -134,12 +134,16 @@ Route::get('lists/{id}', 'ListController@show')->middleware('prerenderIfCrawler'
 // HVN STANDALONE PAGES — must be before the catch-all
 Route::get('creator-signup', [HvnController::class, 'creatorSignup']);
 Route::get('community', [HvnController::class, 'community']);
-Route::post('community/posts', [HvnController::class, 'communityStore'])->middleware('web');
+Route::post('community/posts', [HvnController::class, 'communityStore']);
+Route::get('community/{id}', [HvnController::class, 'communityShow'])->where('id', '[0-9]+');
+Route::post('community/{id}/comments', [HvnController::class, 'commentStore'])->where('id', '[0-9]+');
 Route::get('creators', [HvnController::class, 'creators']);
-Route::get('creators/{userId}', [HvnController::class, 'creatorProfile'])->where('userId', '[0-9]+');
+Route::get('creators/{username}', [HvnController::class, 'creatorProfile'])->where('username', '[^/]+');
+Route::get('creator/dashboard', [HvnController::class, 'creatorDashboard']);
+Route::post('creator/profile', [HvnController::class, 'profileUpdate']);
 
 // SESSION LOGOUT for server-rendered pages
-Route::post('logout', [HvnController::class, 'logout'])->middleware('web');
+Route::post('logout', [HvnController::class, 'logout']);
 
 // CATCH ALL ROUTES AND REDIRECT TO HOME
 Route::get('{all}', $homeController)->where('all', '.*');
