@@ -128,7 +128,7 @@
             padding: 6px 0;
             z-index: 200;
         }
-        .hvn-user:hover .hvn-user-menu { display: block; }
+        .hvn-user-menu.open { display: block; }
         .hvn-user-menu a, .hvn-user-menu button {
             display: block;
             width: 100%;
@@ -369,5 +369,19 @@
 </main>
 
 @yield('scripts')
+<script>
+(function () {
+    var toggle = document.querySelector('.hvn-user');
+    var menu   = document.querySelector('.hvn-user-menu');
+    if (!toggle || !menu) return;
+    toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        menu.classList.toggle('open');
+    });
+    document.addEventListener('click', function () {
+        menu.classList.remove('open');
+    });
+}());
+</script>
 </body>
 </html>

@@ -21,7 +21,7 @@
             $photo       = $profile->profile_photo ?? null;
             $bio         = $profile->bio ?? null;
         @endphp
-        <a href="/creators/{{ $user->id }}" class="hvn-card creator-card">
+        <a href="/creators/{{ $user->username }}" class="hvn-card creator-card">
             <div class="creator-avatar">
                 @if($photo)
                     <img src="{{ asset('storage/' . $photo) }}" alt="{{ $displayName }}">

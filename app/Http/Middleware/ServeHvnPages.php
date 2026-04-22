@@ -36,8 +36,8 @@ class ServeHvnPages
             if (preg_match('/^community\/(\d+)$/', $path, $m))
                 return $this->r($c->communityShow($request, (int) $m[1]));
 
-            if (preg_match('/^creators\/(\d+)$/', $path, $m))
-                return $this->r($c->creatorProfile((int) $m[1]));
+            if (preg_match('/^creators\/([^\/]+)$/', $path, $m))
+                return $this->r($c->creatorProfile($m[1]));
         }
 
         if ($request->isMethod('POST')) {

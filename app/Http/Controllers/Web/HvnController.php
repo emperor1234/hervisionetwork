@@ -121,14 +121,14 @@ class HvnController extends Controller
         return view('hvn.creator-dashboard', compact('user', 'profile', 'posts'));
     }
 
-    public function creatorProfile(int $userId)
+    public function creatorProfile(string $username)
     {
-        $profile = CreatorProfile::whereHas('user', function ($q) {
-                $q->where('role', 'creator');
-            })
-            ->where('user_id', $userId)
+        $user = \App\User::where('username', $username)
+            ->where('role', 'creator')
             ->firstOrFail();
 
-        return view('hvn.creator-profile', compact('profile'));
+        $profile = $user->creatorProfile;
+
+        return view('hvn.creator-profile', compact('user', 'profile'));
     }
 }
