@@ -100,6 +100,27 @@ class HvnController extends Controller
         return redirect('/');
     }
 
+    public function creatorDashboard(Request $request)
+    {
+        if (!auth()->check()) {
+            return redirect('/login');
+        }
+        if (auth()->user()->role !== 'creator') {
+            return redirect('/community');
+        }
+
+        $user    = auth()->user();
+        $profile = $user->creatorProfile;
+        $posts   = CommunityPost::where('user_id', $user->id)
+            ->published()
+            ->withCount(['comments', 'likes'])
+            ->orderByDesc('created_at')
+            ->take(10)
+            ->get();
+
+        return view('hvn.creator-dashboard', compact('user', 'profile', 'posts'));
+    }
+
     public function creatorProfile(int $userId)
     {
         $profile = CreatorProfile::whereHas('user', function ($q) {

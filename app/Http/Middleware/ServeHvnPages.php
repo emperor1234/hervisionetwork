@@ -14,9 +14,11 @@ class ServeHvnPages
         $path = $request->path();
 
         // Quick prefix check — skip controller instantiation for non-HVN requests
-        $isHvn = str_starts_with($path, 'community') ||
-                 str_starts_with($path, 'creators')  ||
-                 $path === 'creator-signup'           ||
+        // Uses strpos() for PHP 7.x compatibility (str_starts_with requires PHP 8.0+)
+        $isHvn = strpos($path, 'community') === 0     ||
+                 strpos($path, 'creators') === 0      ||
+                 $path === 'creator-signup'            ||
+                 $path === 'creator/dashboard'         ||
                  $path === 'logout';
 
         if (!$isHvn) {
@@ -26,9 +28,10 @@ class ServeHvnPages
         $c = app(HvnController::class);
 
         if ($request->isMethod('GET')) {
-            if ($path === 'community')      return $this->r($c->community($request));
-            if ($path === 'creator-signup') return $this->r($c->creatorSignup());
-            if ($path === 'creators')       return $this->r($c->creators($request));
+            if ($path === 'community')         return $this->r($c->community($request));
+            if ($path === 'creator-signup')    return $this->r($c->creatorSignup());
+            if ($path === 'creators')          return $this->r($c->creators($request));
+            if ($path === 'creator/dashboard') return $this->r($c->creatorDashboard($request));
 
             if (preg_match('/^community\/(\d+)$/', $path, $m))
                 return $this->r($c->communityShow($request, (int) $m[1]));
