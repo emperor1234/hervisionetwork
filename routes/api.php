@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\CreatorContentController;
 use App\Http\Controllers\CreatorProfileController;
 use App\Http\Controllers\CreatorsDirectoryController;
 use App\Http\Controllers\EpisodeController;
@@ -91,10 +92,13 @@ Route::group(['prefix' => 'v1'], function() {
         Route::post('community/posts/{postId}/comments', [CommunityController::class, 'addComment']);
         Route::post('community/posts/{postId}/like', [CommunityController::class, 'toggleLike']);
 
-        // CREATOR PROFILE — restricted to creator role only
+        // CREATOR — restricted to creator role only
         Route::middleware('role:creator')->group(function () {
             Route::get('creator/profile', [CreatorProfileController::class, 'show']);
             Route::post('creator/profile', [CreatorProfileController::class, 'store']);
+            Route::get('creator/content', [CreatorContentController::class, 'index']);
+            Route::post('creator/content', [CreatorContentController::class, 'store']);
+            Route::delete('creator/content/{id}', [CreatorContentController::class, 'destroy']);
         });
     });
 

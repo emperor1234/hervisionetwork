@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\CommunityPost;
 use App\CreatorProfile;
+use App\Title;
 use Common\Core\BaseController as Controller;
 use App\CommunityComment;
 use Illuminate\Http\JsonResponse;
@@ -121,7 +122,13 @@ class HvnController extends Controller
             ->take(10)
             ->get();
 
-        return view('hvn.creator-dashboard', compact('user', 'profile', 'posts'));
+        $myContent = Title::whereHas('videos', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('hvn.creator-dashboard', compact('user', 'profile', 'posts', 'myContent'));
     }
 
     public function profileUpdate(Request $request): JsonResponse

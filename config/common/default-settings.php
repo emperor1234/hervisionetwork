@@ -12,8 +12,8 @@ return [
         ['name' => 'Primary', 'position' => 'primary', 'items' => [
             ['type' => 'route', 'order' => 1, 'label' => 'Movies', 'action' => 'browse?type=movie'],
             ['type' => 'route', 'order' => 2, 'label' => 'Series', 'action' => 'browse?type=series'],
-            ['type' => 'route', 'order' => 3, 'label' => 'People', 'action' => 'people'],
-            ['type' => 'route', 'order' => 4, 'label' => 'News', 'action' => 'news']
+            ['type' => 'route', 'order' => 3, 'label' => 'Creators', 'action' => 'creators'],
+            ['type' => 'route', 'order' => 4, 'label' => 'Community', 'action' => 'community']
         ]],
 
         ['name' => 'Explore', 'position' => 'footer-1', 'items' => [
@@ -21,7 +21,7 @@ return [
             ['type' => 'route', 'order' => 2, 'label' => 'Top Shows', 'action' => 'lists/2'],
             ['type' => 'route', 'order' => 3, 'label' => 'Coming Soon', 'action' => 'lists/3'],
             ['type' => 'route', 'order' => 4, 'label' => 'Now Playing', 'action' => 'lists/4'],
-            ['type' => 'route', 'order' => 3, 'label' => 'People', 'action' => 'people'],
+            ['type' => 'route', 'order' => 3, 'label' => 'Creators', 'action' => 'creators'],
         ]],
 
         ['name' => 'Genres', 'position' => 'footer-2', 'items' => [

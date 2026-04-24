@@ -84,9 +84,49 @@
     .profile-form textarea { resize: vertical; min-height: 80px; }
     #profile-alert { margin-bottom: 10px; }
 
+    /* My Content */
+    .content-section { margin-bottom: 28px; }
+    .content-section-head {
+        display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+    }
+    .content-section-head h2 { font-size: 16px; font-weight: 500; color: #ccc; }
+    .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .content-card {
+        background: #2a2a2a; border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 8px; overflow: hidden;
+    }
+    .content-card-thumb {
+        width: 100%; aspect-ratio: 16/9; background: #1a1a1a;
+        display: flex; align-items: center; justify-content: center; color: #333; font-size: 28px;
+    }
+    .content-card-body { padding: 10px; }
+    .content-card-title { font-size: 13px; color: #ddd; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+    .content-card-meta { font-size: 11px; color: #666; margin-bottom: 8px; }
+    .content-card-del { font-size: 11px; color: #c0392b; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
+    .content-card-del:hover { color: #e74c3c; }
+
+    /* Upload form */
+    .upload-panel {
+        background: #2a2a2a; border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 10px; padding: 20px; margin-bottom: 14px;
+    }
+    .upload-panel h3 { font-size: 14px; font-weight: 500; color: #bbb; margin-bottom: 14px; }
+    .upload-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .upload-panel input, .upload-panel select, .upload-panel textarea {
+        width: 100%; background: #1e1e1e; border: 1px solid #333;
+        border-radius: 6px; color: #e0e0e0; padding: 9px 12px;
+        font-size: 13px; font-family: inherit; outline: none;
+        margin-bottom: 10px; transition: border-color .2s;
+    }
+    .upload-panel input:focus, .upload-panel select:focus, .upload-panel textarea:focus { border-color: #F65F54; }
+    .upload-panel select option { background: #1e1e1e; }
+    .upload-panel textarea { resize: vertical; min-height: 70px; }
+    #upload-alert { margin-bottom: 10px; }
+
     @media (max-width: 700px) {
         .dash-grid { grid-template-columns: 1fr; }
         .dash-stats { grid-template-columns: repeat(3, 1fr); }
+        .upload-row { grid-template-columns: 1fr; }
     }
 </style>
 @endsection
@@ -117,6 +157,52 @@
         <div class="stat-num">{{ $totalLikes }}</div>
         <div class="stat-label">Likes received</div>
     </div>
+</div>
+
+{{-- My Content --}}
+<div class="content-section">
+    <div class="content-section-head">
+        <h2>My Content</h2>
+        <button class="dash-edit-btn" style="width:auto;padding:8px 16px;font-size:13px;" onclick="toggleUpload()">+ Upload New</button>
+    </div>
+
+    <div id="upload-panel" class="upload-panel" style="display:none;">
+        <h3>Upload New Content</h3>
+        <div id="upload-alert" class="alert" style="display:none;"></div>
+        <input type="text" id="uc-title" placeholder="Title of your content *">
+        <div class="upload-row">
+            <select id="uc-type">
+                <option value="movie">Movie</option>
+                <option value="short">Short Film</option>
+                <option value="documentary">Documentary</option>
+                <option value="series">Series</option>
+            </select>
+            <input type="number" id="uc-year" placeholder="Year (e.g. 2024)" min="1900" max="2099">
+        </div>
+        <textarea id="uc-desc" placeholder="Short description (optional)"></textarea>
+        <input type="url" id="uc-url" placeholder="Video URL — YouTube, Vimeo or direct link *">
+        <div style="display:flex;gap:10px;">
+            <button class="dash-edit-btn" style="width:auto;padding:9px 20px;" onclick="uploadContent()">Upload</button>
+            <button class="dash-edit-btn" style="width:auto;padding:9px 16px;background:#333;" onclick="toggleUpload()">Cancel</button>
+        </div>
+    </div>
+
+    @if($myContent->isEmpty())
+        <div class="dash-empty">You haven't uploaded any content yet. Click <strong>+ Upload New</strong> to get started.</div>
+    @else
+        <div class="content-grid" id="content-grid">
+            @foreach($myContent as $item)
+            <div class="content-card" id="content-{{ $item->id }}">
+                <div class="content-card-thumb">🎬</div>
+                <div class="content-card-body">
+                    <div class="content-card-title" title="{{ $item->title }}">{{ $item->title }}</div>
+                    <div class="content-card-meta">{{ ucfirst($item->type) }}{{ $item->year ? ' · ' . $item->year : '' }}</div>
+                    <button class="content-card-del" onclick="deleteContent({{ $item->id }}, this)">✕ Remove</button>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    @endif
 </div>
 
 <div class="dash-grid">
@@ -238,5 +324,92 @@ async function saveProfile() {
         alertEl.style.display = 'block';
     }
 }
+
+function toggleUpload() {
+    var panel = document.getElementById('upload-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+async function uploadContent() {
+    var alertEl = document.getElementById('upload-alert');
+    alertEl.style.display = 'none';
+
+    var title = document.getElementById('uc-title').value.trim();
+    var url   = document.getElementById('uc-url').value.trim();
+    if (!title || !url) {
+        alertEl.className = 'alert alert-error';
+        alertEl.textContent = 'Title and video URL are required.';
+        alertEl.style.display = 'block';
+        return;
+    }
+
+    var payload = {
+        title:       title,
+        type:        document.getElementById('uc-type').value,
+        year:        document.getElementById('uc-year').value || null,
+        description: document.getElementById('uc-desc').value.trim() || null,
+        video_url:   url,
+    };
+
+    try {
+        var xsrf = await getXsrfToken();
+        var res = await fetch('/api/v1/creator/content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-XSRF-TOKEN': xsrf },
+            credentials: 'same-origin',
+            body: JSON.stringify(payload),
+        });
+        var data = await res.json();
+        if (res.ok) {
+            var t = data.title;
+            var grid = document.getElementById('content-grid');
+            if (!grid) {
+                document.querySelector('.content-section .dash-empty').outerHTML =
+                    '<div class="content-grid" id="content-grid"></div>';
+                grid = document.getElementById('content-grid');
+            }
+            var card = document.createElement('div');
+            card.className = 'content-card'; card.id = 'content-' + t.id;
+            card.innerHTML = '<div class="content-card-thumb">🎬</div>' +
+                '<div class="content-card-body">' +
+                '<div class="content-card-title">' + escHtml(t.title) + '</div>' +
+                '<div class="content-card-meta">' + ucFirst(t.type) + (t.year ? ' · ' + t.year : '') + '</div>' +
+                '<button class="content-card-del" onclick="deleteContent(' + t.id + ', this)">✕ Remove</button>' +
+                '</div>';
+            grid.prepend(card);
+            document.getElementById('uc-title').value = '';
+            document.getElementById('uc-url').value = '';
+            document.getElementById('uc-desc').value = '';
+            document.getElementById('uc-year').value = '';
+            document.getElementById('upload-panel').style.display = 'none';
+        } else {
+            var msg = data.errors ? Object.values(data.errors).flat().join(' ') : (data.message || 'Upload failed.');
+            alertEl.className = 'alert alert-error'; alertEl.textContent = msg; alertEl.style.display = 'block';
+        }
+    } catch(e) {
+        alertEl.className = 'alert alert-error'; alertEl.textContent = 'Network error.'; alertEl.style.display = 'block';
+    }
+}
+
+async function deleteContent(id, btn) {
+    if (!confirm('Remove this content?')) return;
+    try {
+        var xsrf = await getXsrfToken();
+        var res = await fetch('/api/v1/creator/content/' + id, {
+            method: 'DELETE',
+            headers: { 'Accept': 'application/json', 'X-XSRF-TOKEN': xsrf },
+            credentials: 'same-origin',
+        });
+        if (res.ok) {
+            var card = document.getElementById('content-' + id);
+            if (card) card.remove();
+        }
+    } catch(e) {}
+}
+
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function ucFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 </script>
 @endsection
