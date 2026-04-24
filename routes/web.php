@@ -135,7 +135,7 @@ Route::get('lists/{id}', 'ListController@show')->middleware('prerenderIfCrawler'
 Route::get('creator-signup', [HvnController::class, 'creatorSignup']);
 Route::get('community', [HvnController::class, 'community']);
 Route::post('community/posts', [HvnController::class, 'communityStore']);
-Route::get('community/{id}', [HvnController::class, 'communityShow'])->where('id', '[0-9]+');
+Route::get('community/{id}/{slug?}', [HvnController::class, 'communityShow'])->where('id', '[0-9]+')->where('slug', '[^/]*');
 Route::post('community/{id}/comments', [HvnController::class, 'commentStore'])->where('id', '[0-9]+');
 Route::get('creators', [HvnController::class, 'creators']);
 Route::get('creators/{username}', [HvnController::class, 'creatorProfile'])->where('username', '[^/]+');

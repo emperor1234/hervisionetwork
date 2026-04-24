@@ -152,7 +152,7 @@
 @else
 <div class="post-card-list">
     @foreach($posts as $post)
-    <a href="/community/{{ $post->id }}" class="post-card-link">
+    <a href="/community/{{ $post->id }}/{{ Str::slug($post->title) }}" class="post-card-link">
         <div class="post-card-body">
             <div class="post-avatar">{{ strtoupper(substr($post->user->username ?? '?', 0, 1)) }}</div>
             <div class="post-main">
@@ -224,9 +224,10 @@ async function submitPost() {
     btn.disabled = true; btn.textContent = 'Posting…';
 
     try {
-        const res = await fetch('/community/posts', {
+        const xsrf = await getXsrfToken();
+        const res = await fetch('/api/v1/community/posts', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-XSRF-TOKEN': xsrf },
             credentials: 'same-origin',
             body: JSON.stringify({ title, body })
         });

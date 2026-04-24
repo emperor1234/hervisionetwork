@@ -370,6 +370,13 @@
 
 @yield('scripts')
 <script>
+async function getXsrfToken() {
+    await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+    return document.cookie.split(';').reduce(function(v, c) {
+        var p = c.trim().split('=');
+        return p[0] === 'XSRF-TOKEN' ? decodeURIComponent(p[1]) : v;
+    }, '');
+}
 (function () {
     var toggle = document.querySelector('.hvn-user');
     var menu   = document.querySelector('.hvn-user-menu');

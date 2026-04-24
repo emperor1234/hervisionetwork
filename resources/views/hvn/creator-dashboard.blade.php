@@ -161,7 +161,7 @@
             </div>
         @else
             @foreach($posts as $post)
-            <a href="/community/{{ $post->id }}" class="dash-post-row">
+            <a href="/community/{{ $post->id }}/{{ Str::slug($post->title) }}" class="dash-post-row">
                 <div class="dash-post-title">{{ $post->title }}</div>
                 <div class="dash-post-meta">
                     {{ $post->comments_count }} {{ Str::plural('reply', $post->comments_count) }} ·

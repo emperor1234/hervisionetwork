@@ -69,9 +69,11 @@
         const role = document.querySelector('input[name=role]:checked').value;
 
         try {
+            const xsrf = await getXsrfToken();
             const res = await fetch('/api/v1/auth/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-XSRF-TOKEN': xsrf },
+                credentials: 'same-origin',
                 body: JSON.stringify({
                     email: document.getElementById('email').value,
                     password: document.getElementById('password').value,

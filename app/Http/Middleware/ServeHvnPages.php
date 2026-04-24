@@ -32,7 +32,7 @@ class ServeHvnPages
             if ($path === 'creators')          return $this->r($c->creators($request));
             if ($path === 'creator/dashboard') return $this->r($c->creatorDashboard($request));
 
-            if (preg_match('/^community\/(\d+)$/', $path, $m))
+            if (preg_match('/^community\/(\d+)(?:\/[^\/]*)?$/', $path, $m))
                 return $this->r($c->communityShow($request, (int) $m[1]));
 
             if (preg_match('/^creators\/([^\/]+)$/', $path, $m))

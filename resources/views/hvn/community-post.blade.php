@@ -59,7 +59,10 @@
     <div class="post-body">{{ $post->body }}</div>
     <div class="post-stats">
         <span id="reply-count">{{ $post->comments_count }} {{ Str::plural('reply', $post->comments_count) }}</span>
-        <span>{{ $post->likes_count }} {{ Str::plural('like', $post->likes_count) }}</span>
+        <button id="like-btn" onclick="toggleLike()" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#555;padding:0;font-family:inherit;" title="Like this post">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span id="like-count">{{ $post->likes_count }}</span> {{ Str::plural('like', $post->likes_count) }}
+        </button>
     </div>
 </div>
 
@@ -122,12 +125,13 @@ async function submitComment() {
     btn.textContent = 'Posting…';
 
     try {
-        const res = await fetch('/community/{{ $post->id }}/comments', {
+        const xsrf = await getXsrfToken();
+        const res = await fetch('/api/v1/community/posts/{{ $post->id }}/comments', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-XSRF-TOKEN': xsrf,
             },
             credentials: 'same-origin',
             body: JSON.stringify({ body })
@@ -178,6 +182,27 @@ async function submitComment() {
         btn.disabled = false;
         btn.textContent = 'Reply';
     }
+}
+
+async function toggleLike() {
+    const btn = document.getElementById('like-btn');
+    btn.disabled = true;
+    try {
+        const xsrf = await getXsrfToken();
+        const res = await fetch('/api/v1/community/posts/{{ $post->id }}/like', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'X-XSRF-TOKEN': xsrf },
+            credentials: 'same-origin',
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const count = data.likes_count !== undefined ? data.likes_count : (parseInt(document.getElementById('like-count').textContent) + (data.liked ? 1 : -1));
+            document.getElementById('like-count').textContent = count;
+            btn.style.color = data.liked ? '#F65F54' : '#555';
+            btn.querySelector('svg').style.fill = data.liked ? '#F65F54' : 'none';
+        }
+    } catch(e) {}
+    btn.disabled = false;
 }
 
 function escHtml(s) {

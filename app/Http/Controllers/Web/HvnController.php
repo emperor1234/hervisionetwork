@@ -64,7 +64,7 @@ class HvnController extends Controller
         return response()->json(['post' => $post], 201);
     }
 
-    public function communityShow(Request $request, int $postId)
+    public function communityShow(Request $request, int $postId, string $slug = null)
     {
         $post = CommunityPost::with(['user:id,username', 'comments.user:id,username'])
             ->published()
