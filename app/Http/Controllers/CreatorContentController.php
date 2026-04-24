@@ -57,7 +57,7 @@ class CreatorContentController extends BaseController
         $posterPath = $request->file('cover')->store('creator_content/covers', 'public');
 
         $record = new Title();
-        $record->title  = $request->input('title');
+        $record->name   = $request->input('title');
         $record->type   = $request->input('type');
         $record->year   = $request->input('year');
         $record->plot   = $request->input('description');
@@ -76,7 +76,7 @@ class CreatorContentController extends BaseController
         Video::create([
             'title_id' => $record->id,
             'user_id'  => $user->id,
-            'name'     => $record->title,
+            'name'     => $record->name,
             'url'      => $videoUrl,
             'type'     => 'video',
             'category' => 'full',
