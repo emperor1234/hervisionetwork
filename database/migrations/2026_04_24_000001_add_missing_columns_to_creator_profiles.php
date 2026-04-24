@@ -9,17 +9,17 @@ class AddMissingColumnsToCreatorProfiles extends Migration
     public function up()
     {
         Schema::table('creator_profiles', function (Blueprint $table) {
+            if (!Schema::hasColumn('creator_profiles', 'profile_photo')) {
+                $table->string('profile_photo', 255)->nullable();
+            }
             if (!Schema::hasColumn('creator_profiles', 'website_url')) {
-                $table->string('website_url', 255)->nullable()->after('profile_photo');
+                $table->string('website_url', 255)->nullable();
             }
             if (!Schema::hasColumn('creator_profiles', 'contact_email')) {
-                $table->string('contact_email', 150)->nullable()->after('website_url');
+                $table->string('contact_email', 150)->nullable();
             }
             if (!Schema::hasColumn('creator_profiles', 'social_links')) {
-                $table->json('social_links')->nullable()->after('contact_email');
-            }
-            if (!Schema::hasColumn('creator_profiles', 'profile_photo')) {
-                $table->string('profile_photo', 255)->nullable()->after('bio');
+                $table->json('social_links')->nullable();
             }
         });
     }
