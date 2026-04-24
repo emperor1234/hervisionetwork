@@ -142,6 +142,8 @@
         <div class="profile-form" id="profile-form-card">
             <h3>Edit Public Profile</h3>
             <div id="profile-alert" class="alert" style="display:none;"></div>
+            <input type="text" id="pf-username" placeholder="Username (e.g. jane_doe)" value="{{ e($user->username ?? '') }}">
+            <small style="display:block;color:#666;font-size:12px;margin:-8px 0 12px;">Used in your public URL: /creators/<em id="pf-username-preview">{{ $user->username ?? 'username' }}</em></small>
             <input type="text" id="pf-name"    placeholder="Display name" value="{{ e(optional($profile)->display_name ?? '') }}">
             <textarea id="pf-bio" placeholder="Short bio (shown on your creator card)">{{ e(optional($profile)->bio ?? '') }}</textarea>
             <input type="url"  id="pf-website" placeholder="Website URL (https://…)" value="{{ e(optional($profile)->website_url ?? '') }}">
@@ -179,11 +181,16 @@
 
 @section('scripts')
 <script>
+document.getElementById('pf-username').addEventListener('input', function () {
+    document.getElementById('pf-username-preview').textContent = this.value.trim() || 'username';
+});
+
 async function saveProfile() {
     const alertEl = document.getElementById('profile-alert');
     alertEl.style.display = 'none';
 
     const payload = {
+        username:      document.getElementById('pf-username').value.trim(),
         display_name:  document.getElementById('pf-name').value.trim(),
         bio:           document.getElementById('pf-bio').value.trim(),
         website_url:   document.getElementById('pf-website').value.trim() || null,

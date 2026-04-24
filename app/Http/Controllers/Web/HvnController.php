@@ -135,11 +135,15 @@ class HvnController extends Controller
         }
 
         $request->validate([
+            'username'      => 'required|string|min:3|max:30|alpha_dash|unique:users,username,' . $user->id,
             'display_name'  => 'nullable|string|max:100',
             'bio'           => 'nullable|string|max:1000',
             'website_url'   => 'nullable|url|max:255',
             'contact_email' => 'nullable|email|max:255',
         ]);
+
+        $user->username = $request->input('username');
+        $user->save();
 
         $profile = CreatorProfile::firstOrCreate(['user_id' => $user->id]);
         $profile->fill($request->only('display_name', 'bio', 'website_url', 'contact_email'));

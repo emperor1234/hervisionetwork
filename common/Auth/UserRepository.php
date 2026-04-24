@@ -179,6 +179,21 @@ class UserRepository {
      * @param string $type
      * @return array
      */
+    protected function generateUsername($params)
+    {
+        if (!empty($params['username'])) {
+            return $params['username'];
+        }
+        $base = strtolower(preg_replace('/[^a-z0-9]/i', '_', explode('@', $params['email'])[0]));
+        $base = substr(preg_replace('/_+/', '_', trim($base, '_')) ?: 'user', 0, 20);
+        $username = $base;
+        $i = 1;
+        while ($this->user->where('username', $username)->exists()) {
+            $username = $base . '_' . $i++;
+        }
+        return $username;
+    }
+
     protected function formatParams($params, $type = 'create')
     {
         $formatted = [
@@ -208,6 +223,7 @@ class UserRepository {
             $formatted['role'] = in_array(Arr::get($params, 'role'), $allowedRoles, true)
                 ? $params['role']
                 : 'viewer';
+            $formatted['username'] = $this->generateUsername($params);
         } else if ($type === 'update' && Arr::get($params, 'password')) {
             $formatted['password'] = bcrypt($params['password']);
         }
