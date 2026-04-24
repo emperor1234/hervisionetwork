@@ -34,6 +34,7 @@ class HvnController extends Controller
     public function creators(Request $request)
     {
         $creators = \App\User::where('role', 'creator')
+            ->whereNotNull('username')
             ->with('creatorProfile')
             ->orderBy('username')
             ->paginate(20);
@@ -43,7 +44,8 @@ class HvnController extends Controller
 
     public function communityStore(Request $request): JsonResponse
     {
-        if (!auth()->check()) {
+        $user = $this->resolveUser();
+        if (!$user) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
@@ -53,7 +55,7 @@ class HvnController extends Controller
         ]);
 
         $post = CommunityPost::create([
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
             'title'   => $request->input('title'),
             'body'    => $request->input('body'),
             'status'  => 'published',
@@ -74,7 +76,8 @@ class HvnController extends Controller
 
     public function commentStore(Request $request, int $postId): JsonResponse
     {
-        if (!auth()->check()) {
+        $user = $this->resolveUser();
+        if (!$user) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
@@ -84,7 +87,7 @@ class HvnController extends Controller
 
         $comment = CommunityComment::create([
             'post_id'    => $post->id,
-            'user_id'    => auth()->id(),
+            'user_id'    => $user->id,
             'body'       => $request->input('body'),
             'created_at' => now(),
         ]);
@@ -102,14 +105,14 @@ class HvnController extends Controller
 
     public function creatorDashboard(Request $request)
     {
-        if (!auth()->check()) {
+        $user = $this->resolveUser();
+        if (!$user) {
             return redirect('/login');
         }
-        if (auth()->user()->role !== 'creator') {
+        if ($user->role !== 'creator') {
             return redirect('/community');
         }
 
-        $user    = auth()->user();
         $profile = $user->creatorProfile;
         $posts   = CommunityPost::where('user_id', $user->id)
             ->published()
@@ -123,10 +126,11 @@ class HvnController extends Controller
 
     public function profileUpdate(Request $request): JsonResponse
     {
-        if (!auth()->check()) {
+        $user = $this->resolveUser();
+        if (!$user) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
-        if (auth()->user()->role !== 'creator') {
+        if ($user->role !== 'creator') {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
@@ -137,7 +141,7 @@ class HvnController extends Controller
             'contact_email' => 'nullable|email|max:255',
         ]);
 
-        $profile = CreatorProfile::firstOrCreate(['user_id' => auth()->id()]);
+        $profile = CreatorProfile::firstOrCreate(['user_id' => $user->id]);
         $profile->fill($request->only('display_name', 'bio', 'website_url', 'contact_email'));
         $profile->save();
 
@@ -153,5 +157,10 @@ class HvnController extends Controller
         $profile = $user->creatorProfile;
 
         return view('hvn.creator-profile', compact('user', 'profile'));
+    }
+
+    private function resolveUser()
+    {
+        return auth()->user() ?? auth('sanctum')->user();
     }
 }
