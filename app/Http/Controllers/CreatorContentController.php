@@ -60,7 +60,7 @@ class CreatorContentController extends BaseController
         $record->name   = $request->input('title');
         $record->type   = $request->input('type');
         $record->year   = $request->input('year');
-        $record->plot   = $request->input('description');
+        $record->description = $request->input('description');
         $record->poster = '/storage/' . $posterPath;
         $record->save();
 
