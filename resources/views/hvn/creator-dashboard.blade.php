@@ -190,20 +190,29 @@ async function saveProfile() {
     alertEl.style.display = 'none';
 
     const payload = {
-        username:      document.getElementById('pf-username').value.trim(),
-        display_name:  document.getElementById('pf-name').value.trim(),
-        bio:           document.getElementById('pf-bio').value.trim(),
+        username:      document.getElementById('pf-username').value.trim() || undefined,
+        display_name:  document.getElementById('pf-name').value.trim() || null,
+        bio:           document.getElementById('pf-bio').value.trim() || null,
         website_url:   document.getElementById('pf-website').value.trim() || null,
         contact_email: document.getElementById('pf-contact').value.trim() || null,
     };
 
     try {
-        const res = await fetch('/creator/profile', {
+        // Establish Sanctum stateful session and refresh XSRF cookie
+        await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+
+        // Read XSRF-TOKEN cookie (Laravel URL-encodes it)
+        var xsrfCookie = document.cookie.split(';').reduce(function(val, c) {
+            var parts = c.trim().split('=');
+            return parts[0] === 'XSRF-TOKEN' ? decodeURIComponent(parts[1]) : val;
+        }, '');
+
+        const res = await fetch('/api/v1/creator/profile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-XSRF-TOKEN': xsrfCookie,
             },
             credentials: 'same-origin',
             body: JSON.stringify(payload)

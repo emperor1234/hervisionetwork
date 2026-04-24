@@ -28,8 +28,11 @@ class CreatorProfileController extends BaseController
      */
     public function store(Request $request): JsonResponse
     {
+        $user = $request->user();
+
         $this->validate($request, [
-            'display_name'    => 'required|string|max:150',
+            'username'        => 'nullable|string|min:3|max:30|alpha_dash|unique:users,username,' . $user->id,
+            'display_name'    => 'nullable|string|max:150',
             'bio'             => 'nullable|string|max:2000',
             'website_url'     => 'nullable|url|max:255',
             'contact_email'   => 'nullable|email|max:150',
@@ -38,7 +41,12 @@ class CreatorProfileController extends BaseController
             'profile_photo'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $userId = $request->user()->id;
+        if ($request->filled('username')) {
+            $user->username = $request->input('username');
+            $user->save();
+        }
+
+        $userId = $user->id;
         $data   = $request->only(['display_name', 'bio', 'website_url', 'contact_email']);
 
         // Strip any unrecognised social link keys
