@@ -236,7 +236,7 @@
             <div class="content-card" id="content-{{ $item->id }}">
                 <div class="content-card-thumb">
                     @if($item->poster)
-                        <img src="{{ $item->poster }}" alt="{{ $item->title }}" style="width:100%;height:100%;object-fit:cover;">
+                        <img src="{{ $item->poster }}" alt="{{ $item->name }}" style="width:100%;height:100%;object-fit:cover;">
                     @else
                         🎬
                     @endif
@@ -470,6 +470,8 @@ async function uploadContent() {
             document.getElementById('uc-file').value  = '';
             document.getElementById('cover-drop').classList.remove('has-file');
             document.getElementById('cover-drop').querySelector('span').textContent = 'Click to choose a cover image (JPG / PNG / WebP, max 5 MB)';
+            document.getElementById('video-drop').classList.remove('has-file');
+            document.getElementById('video-drop').querySelector('span').textContent = 'Click to choose a video file (MP4 / WebM, max 500 MB)';
             document.getElementById('upload-panel').style.display = 'none';
         } else {
             var msg = data.errors ? Object.values(data.errors).flat().join(' ') : (data.message || 'Upload failed.');
