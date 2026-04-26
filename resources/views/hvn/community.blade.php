@@ -234,8 +234,14 @@ async function submitPost() {
         if (res.ok) {
             window.location.reload();
         } else {
-            const data = await res.json();
-            const msg = data.errors ? Object.values(data.errors).flat().join(' ') : (data.message || 'Could not post.');
+            const data = await res.json().catch(() => ({}));
+            let msg;
+            if (res.status === 401) {
+                msg = 'Session expired. Please sign in again.';
+                window.location.href = '/login';
+                return;
+            }
+            msg = data.errors ? Object.values(data.errors).flat().join(' ') : (data.message || 'Could not post.');
             alertEl.className = 'alert alert-error';
             alertEl.textContent = msg;
             alertEl.style.display = 'block';

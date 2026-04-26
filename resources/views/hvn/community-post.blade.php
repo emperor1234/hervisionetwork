@@ -59,10 +59,17 @@
     <div class="post-body">{{ $post->body }}</div>
     <div class="post-stats">
         <span id="reply-count">{{ $post->comments_count }} {{ Str::plural('reply', $post->comments_count) }}</span>
-        <button id="like-btn" onclick="toggleLike()" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#555;padding:0;font-family:inherit;" title="Like this post">
+        @auth
+        <button id="like-btn" onclick="toggleLike()" data-auth="yes"
+            style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#555;padding:0;font-family:inherit;" title="Like this post">
+        @else
+        <button id="like-btn" onclick="promptLogin()" data-auth="no"
+            style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#555;padding:0;font-family:inherit;" title="Sign in to like">
+        @endauth
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             <span id="like-count">{{ $post->likes_count }}</span> {{ Str::plural('like', $post->likes_count) }}
         </button>
+        <span id="like-msg" style="font-size:12px;color:#F65F54;margin-left:6px;display:none;"></span>
     </div>
 </div>
 
@@ -167,10 +174,16 @@ async function submitComment() {
             countEl.textContent = next + (next === 1 ? ' reply' : ' replies');
             headEl.textContent  = next + (next === 1 ? ' Comment' : ' Comments');
         } else {
-            const data = await res.json();
-            const msg = data.errors ? Object.values(data.errors).flat().join(' ') : (data.message || 'Could not post.');
+            const data = await res.json().catch(() => ({}));
+            let msg;
+            if (res.status === 401) {
+                msg = 'Your session has expired. Please <a href="/login" style="color:#F65F54;">sign in</a> again.';
+                alertEl.innerHTML = msg;
+            } else {
+                msg = data.errors ? Object.values(data.errors).flat().join(' ') : (data.message || 'Could not post.');
+                alertEl.textContent = msg;
+            }
             alertEl.className = 'alert alert-error';
-            alertEl.textContent = msg;
             alertEl.style.display = 'block';
             btn.disabled = false;
             btn.textContent = 'Reply';
@@ -184,9 +197,18 @@ async function submitComment() {
     }
 }
 
+function promptLogin() {
+    const msg = document.getElementById('like-msg');
+    msg.textContent = 'Sign in to like this post';
+    msg.style.display = 'inline';
+    setTimeout(function() { msg.style.display = 'none'; }, 3000);
+}
+
 async function toggleLike() {
     const btn = document.getElementById('like-btn');
+    const msg = document.getElementById('like-msg');
     btn.disabled = true;
+    msg.style.display = 'none';
     try {
         const xsrf = await getXsrfToken();
         const res = await fetch('/api/v1/community/posts/{{ $post->id }}/like', {
@@ -196,12 +218,26 @@ async function toggleLike() {
         });
         if (res.ok) {
             const data = await res.json();
-            const count = data.likes_count !== undefined ? data.likes_count : (parseInt(document.getElementById('like-count').textContent) + (data.liked ? 1 : -1));
+            const liked = data.action === 'liked';
+            const count = data.likes_count !== undefined ? data.likes_count
+                : (parseInt(document.getElementById('like-count').textContent) + (liked ? 1 : -1));
             document.getElementById('like-count').textContent = count;
-            btn.style.color = data.liked ? '#F65F54' : '#555';
-            btn.querySelector('svg').style.fill = data.liked ? '#F65F54' : 'none';
+            btn.style.color = liked ? '#F65F54' : '#555';
+            btn.querySelector('svg').style.fill = liked ? '#F65F54' : 'none';
+        } else if (res.status === 401) {
+            msg.textContent = 'Please sign in to like posts.';
+            msg.style.display = 'inline';
+            setTimeout(function() { msg.style.display = 'none'; }, 4000);
+        } else {
+            msg.textContent = 'Could not update like. Please try again.';
+            msg.style.display = 'inline';
+            setTimeout(function() { msg.style.display = 'none'; }, 3000);
         }
-    } catch(e) {}
+    } catch(e) {
+        msg.textContent = 'Network error. Please try again.';
+        msg.style.display = 'inline';
+        setTimeout(function() { msg.style.display = 'none'; }, 3000);
+    }
     btn.disabled = false;
 }
 

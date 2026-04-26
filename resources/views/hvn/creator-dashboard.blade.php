@@ -242,7 +242,7 @@
                     @endif
                 </div>
                 <div class="content-card-body">
-                    <div class="content-card-title" title="{{ $item->title }}">{{ $item->title }}</div>
+                    <div class="content-card-title" title="{{ $item->name }}">{{ $item->name }}</div>
                     <div class="content-card-meta">{{ ucfirst($item->type) }}{{ $item->year ? ' · ' . $item->year : '' }}</div>
                     <button class="content-card-del" onclick="deleteContent({{ $item->id }}, this)">✕ Remove</button>
                 </div>
@@ -331,21 +331,13 @@ async function saveProfile() {
     };
 
     try {
-        // Establish Sanctum stateful session and refresh XSRF cookie
-        await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
-
-        // Read XSRF-TOKEN cookie (Laravel URL-encodes it)
-        var xsrfCookie = document.cookie.split(';').reduce(function(val, c) {
-            var parts = c.trim().split('=');
-            return parts[0] === 'XSRF-TOKEN' ? decodeURIComponent(parts[1]) : val;
-        }, '');
-
+        const xsrf = await getXsrfToken();
         const res = await fetch('/api/v1/creator/profile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-XSRF-TOKEN': xsrfCookie,
+                'X-XSRF-TOKEN': xsrf,
             },
             credentials: 'same-origin',
             body: JSON.stringify(payload)
@@ -467,7 +459,7 @@ async function uploadContent() {
             card.className = 'content-card'; card.id = 'content-' + t.id;
             card.innerHTML = '<div class="content-card-thumb">' + thumb + '</div>' +
                 '<div class="content-card-body">' +
-                '<div class="content-card-title">' + escHtml(t.title) + '</div>' +
+                '<div class="content-card-title">' + escHtml(t.name) + '</div>' +
                 '<div class="content-card-meta">' + ucFirst(t.type) + (t.year ? ' · ' + t.year : '') + '</div>' +
                 '<button class="content-card-del" onclick="deleteContent(' + t.id + ', this)">✕ Remove</button>' +
                 '</div>';
