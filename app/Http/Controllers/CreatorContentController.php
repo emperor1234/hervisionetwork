@@ -56,12 +56,19 @@ class CreatorContentController extends BaseController
 
         $posterPath = $request->file('cover')->store('creator_content/covers', 'public');
 
+        $type = $request->input('type');
+
         $record = new Title();
-        $record->name   = $request->input('title');
-        $record->type   = $request->input('type');
-        $record->year   = $request->input('year');
-        $record->description = $request->input('description');
-        $record->poster = '/storage/' . $posterPath;
+        $record->name         = $request->input('title');
+        $record->type         = $type;
+        $record->year         = $request->input('year');
+        $record->description  = $request->input('description');
+        $record->poster       = '/storage/' . $posterPath;
+        $record->adult        = false;
+        $record->is_series    = ($type === 'series') ? true : false;
+        $record->popularity   = 1;
+        $record->fully_synced = true;
+        $record->allow_update = false;
         $record->save();
 
         if ($request->hasFile('video_file')) {

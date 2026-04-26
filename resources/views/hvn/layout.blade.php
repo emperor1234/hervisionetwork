@@ -354,7 +354,7 @@
                 @if($u->role === 'creator')
                     <a href="/creator/dashboard">Dashboard</a>
                 @endif
-                <a href="/account-settings">Settings</a>
+                <a href="/account/settings">Settings</a>
                 <form action="/logout" method="POST" style="margin:0">
                     @csrf
                     <button type="submit">Sign Out</button>
