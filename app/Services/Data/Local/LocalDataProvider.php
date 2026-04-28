@@ -51,21 +51,33 @@ class LocalDataProvider implements DataProvider
         $titles = collect();
         $people = collect();
 
-        $orderCol =
-            config('scout.driver') === 'mysql' &&
-            config('common.site.scout_mysql_mode') === 'fulltext'
-                ? 'relevance'
-                : 'popularity';
         if (Arr::get($params, 'type') !== 'person') {
+            $useFulltext =
+                config('scout.driver') === 'mysql' &&
+                config('common.site.scout_mysql_mode') === 'fulltext' &&
+                strlen($query) >= 3;
+
+            if ($useFulltext) {
+                $titles = $this->title->search($query)->take(20)->get();
+            } else {
+                $q = $query;
                 $titles = $this->title
-                    ->search($query)
+                    ->where(function ($b) use ($q) {
+                        $b->where('name', 'like', "%$q%")
+                          ->orWhere('original_title', 'like', "%$q%");
+                    })
+                    ->orderByRaw(
+                        'CASE WHEN name = ? THEN 0 WHEN name LIKE ? THEN 1 ELSE 2 END, popularity DESC',
+                        [$q, "$q%"]
+                    )
                     ->take(20)
                     ->get();
+            }
 
-                if ($with = Arr::get($params, 'with')) {
-                    $with = array_filter(explode(',', $with));
-                    $titles->load($with);
-                }
+            if ($with = Arr::get($params, 'with')) {
+                $with = array_filter(explode(',', $with));
+                $titles->load($with);
+            }
         }
 
         if (Arr::get($params, 'type') !== 'title') {
