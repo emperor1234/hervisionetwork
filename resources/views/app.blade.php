@@ -107,6 +107,56 @@
         window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
     }, true);
 
+    // Patch Angular admin sidebar: rename People→Creators and News→Community,
+    // redirecting to HVN admin pages instead of Angular routes.
+    (function patchAdminSidebar() {
+        if (window.location.pathname.indexOf('/admin') !== 0) return;
+
+        var ADMIN_LABEL_MAP = {
+            'people':    { label: 'Creators',  href: '/hvn/admin/creators' },
+            'news':      { label: 'Community', href: '/hvn/admin/community' },
+        };
+
+        function patchSidebarLinks() {
+            var links = document.querySelectorAll('a, [role="menuitem"], nav-item, .nav-item, sidebar a, aside a');
+            links.forEach(function(el) {
+                var text = (el.textContent || '').trim().toLowerCase();
+                for (var key in ADMIN_LABEL_MAP) {
+                    if (text === key) {
+                        var map = ADMIN_LABEL_MAP[key];
+                        if (el.__hvnAdminPatched) return;
+                        el.__hvnAdminPatched = true;
+                        // Replace text node containing the label
+                        el.childNodes.forEach(function(node) {
+                            if (node.nodeType === 3 && node.textContent.trim().toLowerCase() === key) {
+                                node.textContent = map.label;
+                            }
+                        });
+                        // If no direct text node (wrapped in span), find it
+                        var spans = el.querySelectorAll('span');
+                        spans.forEach(function(span) {
+                            if ((span.textContent || '').trim().toLowerCase() === key) {
+                                span.textContent = map.label;
+                            }
+                        });
+                        el.setAttribute('href', map.href);
+                        el.addEventListener('click', function(e) {
+                            e.stopImmediatePropagation();
+                            e.preventDefault();
+                            window.location.href = map.href;
+                        }, true);
+                        break;
+                    }
+                }
+            });
+        }
+
+        setTimeout(patchSidebarLinks, 500);
+        setTimeout(patchSidebarLinks, 1500);
+        var obs = new MutationObserver(function() { patchSidebarLinks(); });
+        obs.observe(document.body, { childList: true, subtree: true });
+    }());
+
     // Inject "Join as a Creator" inside Angular's auth-page sign-in/register form.
     // auth-page .info-row  = the "Don't have an account?" row inside the panel.
     // auth-page .auth-panel = the white card containing the form.

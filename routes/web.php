@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\Web\HvnAdminController;
 use App\Http\Controllers\Web\HvnController;
 
 Route::group(['prefix' => 'secure'], function () {
@@ -141,6 +142,16 @@ Route::get('creators', [HvnController::class, 'creators']);
 Route::get('creators/{username}', [HvnController::class, 'creatorProfile'])->where('username', '[^/]+');
 Route::get('creator/dashboard', [HvnController::class, 'creatorDashboard']);
 Route::post('creator/profile', [HvnController::class, 'profileUpdate']);
+
+// HVN ADMIN — must be before the catch-all
+Route::get('hvn/admin',                          [HvnAdminController::class, 'dashboard']);
+Route::get('hvn/admin/creators',                 [HvnAdminController::class, 'creators']);
+Route::get('hvn/admin/community',                [HvnAdminController::class, 'community']);
+Route::get('hvn/admin/content',                  [HvnAdminController::class, 'content']);
+Route::post('hvn/admin/creators/{id}/toggle',    [HvnAdminController::class, 'toggleCreator']);
+Route::post('hvn/admin/community/{id}/hide',     [HvnAdminController::class, 'hidePost']);
+Route::delete('hvn/admin/community/{id}',        [HvnAdminController::class, 'deletePost']);
+Route::delete('hvn/admin/content/{id}',          [HvnAdminController::class, 'deleteContent']);
 
 // SESSION LOGOUT for server-rendered pages
 Route::post('logout', [HvnController::class, 'logout']);
