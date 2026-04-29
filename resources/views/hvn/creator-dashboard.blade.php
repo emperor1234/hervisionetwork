@@ -244,7 +244,10 @@
                 <div class="content-card-body">
                     <div class="content-card-title" title="{{ $item->name }}">{{ $item->name }}</div>
                     <div class="content-card-meta">{{ ucfirst($item->type) }}{{ $item->year ? ' · ' . $item->year : '' }}</div>
-                    <button class="content-card-del" onclick="deleteContent({{ $item->id }}, this)">✕ Remove</button>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+                        <a href="/titles/{{ $item->id }}/{{ \Illuminate\Support\Str::slug($item->name) }}" style="font-size:11px;color:#F65F54;text-decoration:none;" target="_blank">View →</a>
+                        <button class="content-card-del" onclick="deleteContent({{ $item->id }}, this)">✕ Remove</button>
+                    </div>
                 </div>
             </div>
             @endforeach
@@ -457,11 +460,15 @@ async function uploadContent() {
                 : '🎬';
             var card = document.createElement('div');
             card.className = 'content-card'; card.id = 'content-' + t.id;
+            var slug = t.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
             card.innerHTML = '<div class="content-card-thumb">' + thumb + '</div>' +
                 '<div class="content-card-body">' +
                 '<div class="content-card-title">' + escHtml(t.name) + '</div>' +
                 '<div class="content-card-meta">' + ucFirst(t.type) + (t.year ? ' · ' + t.year : '') + '</div>' +
+                '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">' +
+                '<a href="/titles/' + t.id + '/' + slug + '" style="font-size:11px;color:#F65F54;text-decoration:none;" target="_blank">View →</a>' +
                 '<button class="content-card-del" onclick="deleteContent(' + t.id + ', this)">✕ Remove</button>' +
+                '</div>' +
                 '</div>';
             grid.prepend(card);
             // reset form
