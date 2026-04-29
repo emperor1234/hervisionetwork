@@ -9,7 +9,7 @@ class CommunityComment extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['post_id', 'user_id', 'body'];
+    protected $fillable = ['post_id', 'user_id', 'body', 'created_at'];
 
     protected $casts = ['created_at' => 'datetime'];
 

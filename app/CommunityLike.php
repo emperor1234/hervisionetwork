@@ -9,7 +9,7 @@ class CommunityLike extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['post_id', 'user_id'];
+    protected $fillable = ['post_id', 'user_id', 'created_at'];
 
     protected $casts = ['created_at' => 'datetime'];
 

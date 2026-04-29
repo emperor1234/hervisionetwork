@@ -52,7 +52,8 @@
                     <div class="action-btns">
                         <a href="/creators/{{ $creator->username }}" class="btn-action" target="_blank">View</a>
                         <form method="POST" action="/hvn/admin/creators/{{ $creator->id }}/toggle" style="margin:0;"
-                              onsubmit="return confirm('Toggle creator access for {{ addslashes($creator->username) }}?')">
+                              data-username="{{ $creator->username }}"
+                              onsubmit="return confirm('Toggle creator access for ' + this.dataset.username + '?')">
                             @csrf
                             <button type="submit" class="btn-action {{ $creator->role === 'creator' ? 'danger' : 'success' }}">
                                 {{ $creator->role === 'creator' ? 'Revoke' : 'Restore' }}
